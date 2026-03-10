@@ -1,0 +1,3304 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>재료역학 — 응력, 변형률, 재료의 기계적 성질</title>
+<script>
+window.MathJax = {
+  tex: { inlineMath: [['$','$'], ['\\(','\\)']], displayMath: [['$$','$$'], ['\\[','\\]']] },
+  svg: { fontCache: 'global' }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
+<style>
+  :root {
+    --bg: #ffffff;
+    --bg-alt: #f7f8fa;
+    --bg-card: #ffffff;
+    --text: #1a1a2e;
+    --text-light: #555;
+    --accent: #2563eb;
+    --accent2: #7c3aed;
+    --accent3: #059669;
+    --accent4: #dc2626;
+    --border: #e2e8f0;
+    --shadow: 0 2px 12px rgba(0,0,0,0.06);
+    --shadow-lg: 0 8px 32px rgba(0,0,0,0.10);
+    --radius: 12px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.8;
+    font-size: 17px;
+  }
+
+  /* Hero */
+  .hero {
+    background: linear-gradient(135deg, #2563eb 0%, #7c3aed 50%, #059669 100%);
+    color: #fff;
+    padding: 80px 40px 60px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: url("data:image/svg+xml,%3Csvg width='60' height='60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 30h60M30 0v60' stroke='rgba(255,255,255,0.07)' stroke-width='1'/%3E%3C/svg%3E");
+  }
+  .hero h1 { font-size: 2.8em; font-weight: 800; position: relative; letter-spacing: -0.02em; }
+  .hero .subtitle { font-size: 1.3em; opacity: 0.9; margin-top: 12px; position: relative; font-weight: 300; }
+
+  /* Container */
+  .container { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
+
+  /* Section */
+  section {
+    padding: 60px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  section:last-child { border-bottom: none; }
+
+  h2 {
+    font-size: 2em;
+    font-weight: 700;
+    color: var(--accent);
+    margin-bottom: 28px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  h2 .num {
+    background: var(--accent);
+    color: #fff;
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.6em;
+    flex-shrink: 0;
+  }
+
+  h3 {
+    font-size: 1.35em;
+    font-weight: 600;
+    color: var(--text);
+    margin: 32px 0 16px;
+    padding-left: 14px;
+    border-left: 4px solid var(--accent);
+  }
+
+  h4 {
+    font-size: 1.1em;
+    font-weight: 600;
+    color: var(--accent2);
+    margin: 24px 0 12px;
+  }
+
+  p { margin-bottom: 14px; }
+
+  /* Cards */
+  .card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 28px;
+    margin: 20px 0;
+    box-shadow: var(--shadow);
+    transition: box-shadow 0.3s;
+  }
+  .card:hover { box-shadow: var(--shadow-lg); }
+
+  .card-accent {
+    border-left: 4px solid var(--accent);
+  }
+  .card-purple { border-left: 4px solid var(--accent2); }
+  .card-green { border-left: 4px solid var(--accent3); }
+  .card-red { border-left: 4px solid var(--accent4); }
+
+  /* Grid */
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    margin: 20px 0;
+  }
+  @media (max-width: 768px) {
+    .grid-2 { grid-template-columns: 1fr; }
+    .hero h1 { font-size: 1.8em; }
+  }
+
+  /* Equations */
+  .equation-box {
+    background: linear-gradient(135deg, #eff6ff, #f0f0ff);
+    border: 2px solid var(--accent);
+    border-radius: var(--radius);
+    padding: 24px;
+    margin: 20px 0;
+    text-align: center;
+    font-size: 1.2em;
+  }
+
+  /* Tables */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    font-size: 0.95em;
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: var(--shadow);
+  }
+  thead { background: var(--accent); color: #fff; }
+  th { padding: 14px 18px; text-align: left; font-weight: 600; }
+  td { padding: 12px 18px; border-bottom: 1px solid var(--border); }
+  tbody tr:nth-child(even) { background: var(--bg-alt); }
+  tbody tr:hover { background: #e8f0fe; }
+
+  /* SVG Diagram containers */
+  .diagram-container {
+    background: var(--bg-alt);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+    margin: 24px 0;
+    text-align: center;
+    overflow-x: auto;
+  }
+  .diagram-container svg { max-width: 100%; height: auto; }
+  .diagram-caption {
+    text-align: center;
+    font-size: 0.9em;
+    color: var(--text-light);
+    margin-top: 10px;
+    font-style: italic;
+  }
+
+  /* Highlight / Callout */
+  .callout {
+    background: #fffbeb;
+    border: 1px solid #f59e0b;
+    border-left: 4px solid #f59e0b;
+    border-radius: var(--radius);
+    padding: 18px 22px;
+    margin: 20px 0;
+    font-size: 0.97em;
+  }
+  .callout-blue {
+    background: #eff6ff;
+    border-color: var(--accent);
+  }
+  .callout strong { color: #92400e; }
+  .callout-blue strong { color: var(--accent); }
+
+  /* Tag/Badge */
+  .badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 0.82em;
+    font-weight: 600;
+    margin-right: 6px;
+  }
+  .badge-blue { background: #dbeafe; color: #1e40af; }
+  .badge-purple { background: #ede9fe; color: #5b21b6; }
+  .badge-green { background: #d1fae5; color: #065f46; }
+  .badge-red { background: #fee2e2; color: #991b1b; }
+
+  /* Key concept emphasis */
+  .key {
+    background: linear-gradient(120deg, #fef08a 0%, #fde68a 100%);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-weight: 600;
+  }
+
+  /* Analogy box */
+  .analogy {
+    background: linear-gradient(135deg, #f0fdf4, #ecfdf5);
+    border: 1px solid #86efac;
+    border-radius: var(--radius);
+    padding: 20px 24px;
+    margin: 20px 0;
+  }
+  .analogy::before {
+    content: '💡 직관적 이해';
+    display: block;
+    font-weight: 700;
+    color: var(--accent3);
+    margin-bottom: 8px;
+    font-size: 0.95em;
+  }
+
+  /* Comparison side-by-side */
+  .vs-container {
+    display: flex;
+    gap: 0;
+    margin: 24px 0;
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: var(--shadow);
+  }
+  .vs-left, .vs-right {
+    flex: 1;
+    padding: 24px;
+  }
+  .vs-left { background: #eff6ff; border-right: 3px solid var(--accent); }
+  .vs-right { background: #fef2f2; border-left: 3px solid var(--accent4); }
+  .vs-title {
+    font-weight: 700;
+    font-size: 1.1em;
+    margin-bottom: 12px;
+  }
+  @media (max-width: 640px) {
+    .vs-container { flex-direction: column; }
+    .vs-left { border-right: none; border-bottom: 3px solid var(--accent); }
+    .vs-right { border-left: none; border-top: 3px solid var(--accent4); }
+  }
+
+  /* Animated arrows */
+  @keyframes pulseArrow {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+  .arrow-pulse { animation: pulseArrow 1.5s ease-in-out infinite; }
+
+  @keyframes stretch {
+    0%, 100% { transform: scaleX(1); }
+    50% { transform: scaleX(1.08); }
+  }
+  .anim-stretch { animation: stretch 2s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+
+  @keyframes compress {
+    0%, 100% { transform: scaleX(1); }
+    50% { transform: scaleX(0.92); }
+  }
+  .anim-compress { animation: compress 2s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+
+  @keyframes stretchDelta {
+    0%, 100% { transform: scaleX(0.8235); }
+    50% { transform: scaleX(1); }
+  }
+  .anim-stretch-delta { animation: stretchDelta 2.5s ease-in-out infinite; transform-box: fill-box; transform-origin: left center; }
+
+  @keyframes shear {
+    0%, 100% { transform: skewX(0deg); }
+    50% { transform: skewX(-6deg); }
+  }
+  .anim-shear { animation: shear 2s ease-in-out infinite; transform-origin: bottom left; }
+
+  @keyframes fadeSlideUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .fade-in { animation: fadeSlideUp 0.6s ease-out both; }
+
+  /* Interactive chart */
+  .chart-wrapper {
+    position: relative;
+    margin: 24px 0;
+    background: var(--bg-alt);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+  }
+
+  /* Tooltip for SVG */
+  .svg-tooltip {
+    position: absolute;
+    background: #1e293b;
+    color: #fff;
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-size: 0.85em;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.2s;
+    z-index: 10;
+    max-width: 260px;
+    line-height: 1.5;
+  }
+
+  /* Nav TOC */
+  .toc {
+    background: var(--bg-alt);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px 28px;
+    margin: 40px 0;
+  }
+  .toc h3 { border: none; padding: 0; margin: 0 0 16px; color: var(--accent); font-size: 1.2em; }
+  .toc ul { list-style: none; padding: 0; }
+  .toc li { margin: 8px 0; }
+  .toc a {
+    color: var(--text);
+    text-decoration: none;
+    padding: 6px 12px;
+    display: block;
+    border-radius: 8px;
+    transition: all 0.2s;
+    font-weight: 500;
+  }
+  .toc a:hover { background: #dbeafe; color: var(--accent); }
+
+  /* Specimen interactive */
+  .specimen-container {
+    position: relative;
+    cursor: pointer;
+  }
+
+  /* Step indicator */
+  .steps {
+    counter-reset: step;
+    list-style: none;
+    padding: 0;
+  }
+  .steps li {
+    counter-increment: step;
+    position: relative;
+    padding: 12px 0 12px 56px;
+    margin-bottom: 8px;
+  }
+  .steps li::before {
+    content: counter(step);
+    position: absolute;
+    left: 0; top: 10px;
+    width: 36px; height: 36px;
+    background: var(--accent);
+    color: #fff;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700;
+    font-size: 0.9em;
+  }
+
+  /* Footer */
+  footer {
+    text-align: center;
+    padding: 40px 24px;
+    color: var(--text-light);
+    font-size: 0.9em;
+    background: var(--bg-alt);
+    border-top: 1px solid var(--border);
+  }
+
+  /* Print friendly */
+  @media print {
+    .hero { padding: 30px; }
+    section { page-break-inside: avoid; }
+  }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 8px; }
+  ::-webkit-scrollbar-track { background: var(--bg-alt); }
+  ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+
+  /* ============ Quiz Section (scoped) ============ */
+  .quiz-section {
+    padding: 0 !important;
+    border-bottom: none !important;
+  }
+
+  .quiz-section .quiz-header {
+    background: linear-gradient(135deg, #4a90d9, #6c5ce7);
+    color: #fff;
+    padding: 48px 24px 40px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    border-radius: var(--radius) var(--radius) 0 0;
+    margin-top: 40px;
+  }
+  .quiz-section .quiz-header::before {
+    content: '';
+    position: absolute;
+    top: -40%; left: -10%;
+    width: 120%; height: 180%;
+    background: radial-gradient(circle at 30% 50%, rgba(255,255,255,0.08) 0%, transparent 60%);
+    pointer-events: none;
+  }
+  .quiz-section .quiz-header h2 {
+    font-size: 2.2rem;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    position: relative;
+    color: #fff;
+    justify-content: center;
+    margin-bottom: 0;
+  }
+  .quiz-section .quiz-header p {
+    margin-top: 10px;
+    font-size: 1rem;
+    opacity: 0.9;
+    font-weight: 300;
+    position: relative;
+  }
+
+  .quiz-section .score-bar {
+    background: #fff;
+    border-bottom: 1px solid #e0e4ea;
+    padding: 16px 24px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 32px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  }
+  .quiz-section .score-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.95rem;
+    font-weight: 500;
+  }
+  .quiz-section .score-item .dot {
+    width: 12px; height: 12px;
+    border-radius: 50%;
+    display: inline-block;
+  }
+  .quiz-section .dot.correct { background: #27ae60; }
+  .quiz-section .dot.wrong { background: #e74c3c; }
+  .quiz-section .dot.remaining { background: #bdc3c7; }
+
+  .quiz-section .quiz-container {
+    max-width: 820px;
+    margin: 0 auto;
+    padding: 32px 20px 80px;
+  }
+
+  .quiz-section .part-title {
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: #4a90d9;
+    margin: 48px 0 20px;
+    padding-bottom: 12px;
+    border-bottom: 3px solid #4a90d9;
+    border-left: none;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .quiz-section .part-title:first-child { margin-top: 0; }
+
+  .quiz-section .part-icon {
+    width: 36px; height: 36px;
+    background: #4a90d9;
+    color: #fff;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+
+  .quiz-section .quiz-card {
+    background: #fff;
+    border-radius: 16px;
+    padding: 28px 32px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    border: 1px solid #e8ecf1;
+    transition: box-shadow 0.3s, border-color 0.3s;
+  }
+  .quiz-section .quiz-card:hover { box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+  .quiz-section .quiz-card.answered-correct { border-color: #27ae60; background: #f8fdf9; }
+  .quiz-section .quiz-card.answered-wrong { border-color: #e74c3c; background: #fef8f8; }
+
+  .quiz-section .q-number {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #4a90d9, #6c5ce7);
+    color: #fff;
+    font-size: 0.8rem;
+    font-weight: 700;
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    margin-right: 10px;
+    flex-shrink: 0;
+  }
+  .quiz-section .q-header { display: flex; align-items: center; margin-bottom: 6px; }
+  .quiz-section .q-title { font-size: 1.05rem; font-weight: 600; color: #555; }
+  .quiz-section .q-text { font-size: 1rem; margin-bottom: 20px; color: #333; font-weight: 400; }
+  .quiz-section .q-text strong { color: #e74c3c; }
+
+  .quiz-section .options { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+  .quiz-section .option-label {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 14px 18px;
+    border: 2px solid #e8ecf1;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 0.95rem;
+    user-select: none;
+  }
+  .quiz-section .option-label:hover { border-color: #4a90d9; background: #f5f8fd; }
+  .quiz-section .option-label input { display: none; }
+
+  .quiz-section .option-radio {
+    width: 22px; height: 22px;
+    border: 2px solid #ccc;
+    border-radius: 50%;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    margin-top: 1px;
+  }
+  .quiz-section .option-check {
+    width: 22px; height: 22px;
+    border: 2px solid #ccc;
+    border-radius: 6px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    margin-top: 1px;
+  }
+  .quiz-section .option-label input:checked ~ .option-radio {
+    border-color: #4a90d9;
+    background: #4a90d9;
+  }
+  .quiz-section .option-label input:checked ~ .option-radio::after {
+    content: '';
+    width: 8px; height: 8px;
+    background: #fff;
+    border-radius: 50%;
+  }
+  .quiz-section .option-label input:checked ~ .option-check {
+    border-color: #4a90d9;
+    background: #4a90d9;
+  }
+  .quiz-section .option-label input:checked ~ .option-check::after {
+    content: '\2713';
+    color: #fff;
+    font-size: 14px;
+    font-weight: 700;
+  }
+  .quiz-section .option-label.correct-answer { border-color: #27ae60 !important; background: #eafaf1 !important; }
+  .quiz-section .option-label.wrong-answer { border-color: #e74c3c !important; background: #fdeaea !important; }
+  .quiz-section .option-label.disabled { pointer-events: none; opacity: 0.7; }
+  .quiz-section .option-label.correct-answer.disabled,
+  .quiz-section .option-label.wrong-answer.disabled { opacity: 1; }
+
+  .quiz-section .text-input-group { display: flex; gap: 10px; margin-bottom: 8px; }
+  .quiz-section .text-input {
+    flex: 1;
+    padding: 12px 16px;
+    border: 2px solid #e8ecf1;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-family: 'Noto Sans KR', 'Pretendard', sans-serif;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .quiz-section .text-input:focus { border-color: #4a90d9; }
+
+  .quiz-section .fill-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 16px;
+    font-size: 0.9rem;
+    box-shadow: none;
+  }
+  .quiz-section .fill-table th,
+  .quiz-section .fill-table td {
+    border: 2px solid #e0e4ea;
+    padding: 12px 14px;
+    text-align: center;
+  }
+  .quiz-section .fill-table th {
+    background: #f0f2f5;
+    font-weight: 600;
+    color: #444;
+  }
+  .quiz-section .fill-table td { background: #fff; }
+  .quiz-section .fill-table input {
+    width: 100%;
+    border: none;
+    border-bottom: 2px dashed #4a90d9;
+    text-align: center;
+    font-size: 0.9rem;
+    font-family: 'Noto Sans KR', 'Pretendard', sans-serif;
+    padding: 4px;
+    outline: none;
+    background: transparent;
+    color: #4a90d9;
+    font-weight: 600;
+  }
+
+  .quiz-section .qbtn {
+    padding: 11px 28px;
+    border: none;
+    border-radius: 10px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: 'Noto Sans KR', 'Pretendard', sans-serif;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .quiz-section .qbtn-primary {
+    background: linear-gradient(135deg, #4a90d9, #6c5ce7);
+    color: #fff;
+  }
+  .quiz-section .qbtn-primary:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(74,144,217,0.4); }
+  .quiz-section .qbtn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
+  .quiz-section .btn-group { display: flex; gap: 10px; flex-wrap: wrap; }
+
+  .quiz-section .explanation {
+    margin-top: 18px;
+    padding: 20px 24px;
+    background: #f5f8fd;
+    border-left: 4px solid #4a90d9;
+    border-radius: 0 12px 12px 0;
+    display: none;
+    animation: slideDown 0.3s ease;
+  }
+  @keyframes slideDown {
+    from { opacity: 0; transform: translateY(-8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .quiz-section .explanation.show { display: block; }
+  .quiz-section .explanation .answer-tag {
+    display: inline-block;
+    background: #4a90d9;
+    color: #fff;
+    padding: 3px 12px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-bottom: 10px;
+  }
+  .quiz-section .explanation p { font-size: 0.93rem; color: #444; line-height: 1.8; }
+  .quiz-section .explanation table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+    font-size: 0.88rem;
+    box-shadow: none;
+  }
+  .quiz-section .explanation table th,
+  .quiz-section .explanation table td {
+    border: 1px solid #d0d5dd;
+    padding: 8px 12px;
+    text-align: center;
+  }
+  .quiz-section .explanation table th { background: #e8ecf1; font-weight: 600; }
+  .quiz-section .explanation table thead { background: #e8ecf1; color: #444; }
+
+  .quiz-section .result-badge {
+    display: none;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin-top: 14px;
+  }
+  .quiz-section .result-badge.show { display: flex; }
+  .quiz-section .result-badge.correct { color: #27ae60; }
+  .quiz-section .result-badge.wrong { color: #e74c3c; }
+
+  .quiz-section .footer-actions {
+    text-align: center;
+    margin-top: 48px;
+    padding-top: 32px;
+    border-top: 2px solid #e0e4ea;
+  }
+  .quiz-section .qbtn-reset {
+    background: #fff;
+    color: #e74c3c;
+    border: 2px solid #e74c3c;
+    padding: 14px 40px;
+    font-size: 1.05rem;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: 'Noto Sans KR', 'Pretendard', sans-serif;
+    transition: all 0.2s;
+  }
+  .quiz-section .qbtn-reset:hover { background: #e74c3c; color: #fff; }
+
+  .quiz-section .final-score {
+    display: none;
+    text-align: center;
+    margin-top: 24px;
+    padding: 32px;
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+  }
+  .quiz-section .final-score.show { display: block; }
+  .quiz-section .final-score .big-score {
+    font-size: 3rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, #4a90d9, #6c5ce7);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .quiz-section .final-score p { color: #666; margin-top: 8px; font-size: 1rem; }
+
+  .quiz-section .progress-bar-bg {
+    width: 200px; height: 8px;
+    background: #e0e4ea;
+    border-radius: 4px;
+    overflow: hidden;
+    display: inline-block;
+  }
+  .quiz-section .progress-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #4a90d9, #6c5ce7);
+    border-radius: 4px;
+    transition: width 0.5s ease;
+  }
+
+  @media (max-width: 600px) {
+    .quiz-section .quiz-header h2 { font-size: 1.6rem; }
+    .quiz-section .quiz-card { padding: 20px 18px; }
+    .quiz-section .score-bar { gap: 16px; flex-wrap: wrap; }
+    .quiz-section .option-label { padding: 12px 14px; font-size: 0.9rem; }
+    .quiz-section .text-input-group { flex-direction: column; }
+  }
+
+  /* ============ Atomic Section (scoped) ============ */
+  .atomic-section {
+    padding: 0 !important;
+    border-bottom: none !important;
+  }
+
+  .atomic-section .atomic-header {
+    text-align: center;
+    padding: 80px 0 60px;
+    border-bottom: 1px solid var(--border);
+    margin: 40px 0 60px;
+    border-radius: var(--radius) var(--radius) 0 0;
+  }
+  .atomic-section .atomic-header h2 {
+    font-size: 2.4rem;
+    font-weight: 900;
+    letter-spacing: -1px;
+    background: linear-gradient(135deg, #1d4ed8, #0d9668);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    justify-content: center;
+    margin-bottom: 12px;
+  }
+  .atomic-section .atomic-header p {
+    color: var(--text-light);
+    font-size: 1.05rem;
+  }
+
+  .atomic-section .atomic-container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 24px 80px;
+  }
+
+  .atomic-section .asection {
+    margin-bottom: 72px;
+  }
+  .atomic-section .section-number {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.85rem;
+    color: var(--accent);
+    letter-spacing: 2px;
+    margin-bottom: 8px;
+  }
+  .atomic-section .asection h3 {
+    font-size: 1.6rem;
+    font-weight: 700;
+    margin-bottom: 20px;
+    color: #1a202c;
+    border-left: none;
+    padding-left: 0;
+  }
+  .atomic-section .asection h4 {
+    font-size: 1.15rem;
+    font-weight: 500;
+    margin: 28px 0 12px;
+    color: var(--accent3);
+  }
+
+  .atomic-section .highlight {
+    background: var(--bg-alt);
+    border-left: 3px solid var(--accent);
+    padding: 16px 20px;
+    border-radius: 0 var(--radius) var(--radius) 0;
+    margin: 20px 0;
+    font-size: 0.95rem;
+  }
+
+  .atomic-section .viz-container {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px;
+    margin: 24px 0;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  }
+  .atomic-section .viz-container::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--accent), var(--accent3));
+  }
+  .atomic-section .viz-title {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.8rem;
+    color: var(--text-light);
+    margin-bottom: 16px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  .atomic-section svg text {
+    font-family: 'Noto Sans KR', 'Pretendard', sans-serif;
+  }
+
+  .atomic-section .controls {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+  }
+  .atomic-section .controls label {
+    font-size: 0.85rem;
+    color: var(--text-light);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .atomic-section input[type="range"] {
+    -webkit-appearance: none;
+    background: var(--border);
+    height: 4px;
+    border-radius: 2px;
+    outline: none;
+    width: 160px;
+  }
+  .atomic-section input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 16px; height: 16px;
+    border-radius: 50%;
+    background: var(--accent);
+    cursor: pointer;
+  }
+
+  .atomic-section button.step-btn {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.8rem;
+    padding: 8px 20px;
+    border: 1px solid var(--accent);
+    background: transparent;
+    color: var(--accent);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 0.5px;
+  }
+  .atomic-section button.step-btn:hover {
+    background: var(--accent);
+    color: #fff;
+  }
+  .atomic-section button.step-btn.reset {
+    border-color: var(--text-light);
+    color: var(--text-light);
+  }
+  .atomic-section button.step-btn.reset:hover {
+    background: var(--text-light);
+    color: #fff;
+  }
+
+  .atomic-section .toggle-group {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .atomic-section .toggle-btn {
+    font-size: 0.78rem;
+    padding: 5px 14px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text-light);
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: 'Noto Sans KR', 'Pretendard', sans-serif;
+  }
+  .atomic-section .toggle-btn.active {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: rgba(37,99,235,0.1);
+  }
+
+  .atomic-section .caption {
+    font-size: 0.82rem;
+    color: var(--text-light);
+    text-align: center;
+    margin-top: 8px;
+    font-style: italic;
+  }
+
+  .atomic-section .summary-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    font-size: 0.9rem;
+    box-shadow: none;
+  }
+  .atomic-section .summary-table th {
+    background: var(--bg-alt);
+    padding: 12px 16px;
+    text-align: left;
+    font-weight: 500;
+    color: var(--accent);
+    border-bottom: 2px solid var(--accent);
+  }
+  .atomic-section .summary-table td {
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text);
+  }
+  .atomic-section .summary-table thead { background: transparent; color: var(--accent); }
+  .atomic-section .summary-table tr:hover td { background: var(--bg-alt); }
+
+  @media (max-width: 640px) {
+    .atomic-section .atomic-header h2 { font-size: 1.6rem; }
+    .atomic-section .asection h3 { font-size: 1.3rem; }
+    .atomic-section input[type="range"] { width: 120px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ==================== HERO ==================== -->
+<div class="hero">
+  <h1>재료역학</h1>
+  <div class="subtitle">응력(Stress) · 변형률(Strain) · 재료의 기계적 성질</div>
+</div>
+
+<div class="container">
+
+<!-- ==================== TOC ==================== -->
+<nav class="toc fade-in">
+  <h3>목차</h3>
+  <ul>
+    <li><a href="#sec-stress">1. 응력 (Stress)</a></li>
+    <li><a href="#sec-strain">2. 변형률 (Strain)</a></li>
+    <li><a href="#sec-material">3. 재료의 기계적 성질 — 응력–변형률 선도</a></li>
+    <li style="margin-top:16px;">
+      <a href="#sec-quiz" style="background:linear-gradient(135deg,#4a90d9,#6c5ce7);color:#fff;font-weight:700;border-radius:10px;padding:10px 20px;text-align:center;display:inline-block;">
+        퀴즈 풀기 →
+      </a>
+      <a href="#sec-atomic" style="background:linear-gradient(135deg,#1d4ed8,#0d9668);color:#fff;font-weight:700;border-radius:10px;padding:10px 20px;text-align:center;display:inline-block;margin-left:8px;">
+        원자 관점 →
+      </a>
+    </li>
+  </ul>
+</nav>
+
+<!-- ============================================================ -->
+<!--                    SECTION 1 : 응력                           -->
+<!-- ============================================================ -->
+<section id="sec-stress">
+  <h2><span class="num">1</span> 응력 (Stress)</h2>
+
+  <p>
+    외부에서 작용하는 하중(힘, 모멘트, 온도 변화 등)과 평형을 이루기 위해
+    <span class="key">물체 내부에 작용하는 단위 면적당 내력</span>이다.
+  </p>
+
+  <!-- ========= 개념 다이어그램: 외력 → 내력 ========= -->
+  <div class="diagram-container">
+    <svg viewBox="0 0 800 260" xmlns="http://www.w3.org/2000/svg" style="max-width:700px;">
+      <!-- Bar body -->
+      <defs>
+        <linearGradient id="barGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#93c5fd"/>
+          <stop offset="100%" stop-color="#3b82f6"/>
+        </linearGradient>
+        <marker id="arrowR" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+          <polygon points="0 0, 10 3.5, 0 7" fill="#dc2626"/>
+        </marker>
+        <marker id="arrowB" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+          <polygon points="0 0, 10 3.5, 0 7" fill="#059669"/>
+        </marker>
+        <marker id="arrowL" markerWidth="10" markerHeight="7" refX="0" refY="3.5" orient="auto">
+          <polygon points="10 0, 0 3.5, 10 7" fill="#dc2626"/>
+        </marker>
+      </defs>
+
+      <!-- Wall (left) -->
+      <rect x="20" y="70" width="16" height="120" fill="#9ca3af" rx="2"/>
+      <line x1="20" y1="70" x2="20" y2="190" stroke="#6b7280" stroke-width="2"/>
+      <g stroke="#6b7280" stroke-width="1.5">
+        <line x1="20" y1="75" x2="8" y2="87"/>
+        <line x1="20" y1="95" x2="8" y2="107"/>
+        <line x1="20" y1="115" x2="8" y2="127"/>
+        <line x1="20" y1="135" x2="8" y2="147"/>
+        <line x1="20" y1="155" x2="8" y2="167"/>
+        <line x1="20" y1="175" x2="8" y2="187"/>
+      </g>
+
+      <!-- Bar -->
+      <rect x="36" y="95" width="420" height="70" rx="4" fill="url(#barGrad)" stroke="#2563eb" stroke-width="2"/>
+      <text x="246" y="137" text-anchor="middle" fill="#fff" font-size="16" font-weight="600">물체 (Body)</text>
+
+      <!-- External Force (right) -->
+      <line x1="456" y1="130" x2="550" y2="130" stroke="#dc2626" stroke-width="3" marker-end="url(#arrowR)" class="arrow-pulse"/>
+      <text x="510" y="118" text-anchor="middle" fill="#dc2626" font-size="15" font-weight="700">F (외력)</text>
+
+      <!-- Imaginary cut plane -->
+      <line x1="260" y1="75" x2="260" y2="185" stroke="#7c3aed" stroke-width="2.5" stroke-dasharray="8,5"/>
+      <text x="260" y="62" text-anchor="middle" fill="#7c3aed" font-size="13" font-weight="600">가상 절단면</text>
+
+      <!-- Internal stress arrows (right half) -->
+      <g class="arrow-pulse" style="animation-delay:0.3s;">
+        <line x1="262" y1="110" x2="310" y2="110" stroke="#059669" stroke-width="2.5" marker-end="url(#arrowB)"/>
+        <line x1="262" y1="130" x2="310" y2="130" stroke="#059669" stroke-width="2.5" marker-end="url(#arrowB)"/>
+        <line x1="262" y1="150" x2="310" y2="150" stroke="#059669" stroke-width="2.5" marker-end="url(#arrowB)"/>
+      </g>
+      <text x="340" y="178" fill="#059669" font-size="13" font-weight="600">내력 (σ·A)</text>
+
+      <!-- Annotation -->
+      <text x="600" y="175" fill="#555" font-size="13">σ = F / A</text>
+      <rect x="586" y="158" width="100" height="26" rx="6" fill="none" stroke="#2563eb" stroke-width="1.5" stroke-dasharray="4,3"/>
+
+      <!-- Area label -->
+      <path d="M 260 95 L 260 165" stroke="none"/>
+      <text x="245" y="215" text-anchor="middle" fill="#7c3aed" font-size="12">단면적 A</text>
+
+      <!-- Legend -->
+      <rect x="590" y="70" width="14" height="14" rx="2" fill="#dc2626"/>
+      <text x="610" y="82" fill="#555" font-size="12">외력 (External)</text>
+      <rect x="590" y="92" width="14" height="14" rx="2" fill="#059669"/>
+      <text x="610" y="104" fill="#555" font-size="12">내력 (Internal)</text>
+    </svg>
+    <div class="diagram-caption">그림 1-1. 외력에 의한 내력(응력) 발생 개념도</div>
+  </div>
+
+  <div class="analogy">
+    못 위에 서는 것을 상상해 보자. 못 1개 위에 서면 발이 뚫리지만, 수천 개의 못(못 침대) 위에 서면 괜찮다.
+    같은 힘(체중)이라도 <strong>면적이 넓으면 응력이 작아지기</strong> 때문이다.
+    이것이 바로 <strong>단위 면적당 힘</strong>으로 정의해야 하는 이유이다.
+  </div>
+
+  <!-- ===== 수직응력 ===== -->
+  <h3 id="normal-stress">1.1 수직응력 (Normal Stress, σ)</h3>
+
+  <div class="grid-2">
+    <div>
+      <p>가상의 단면에 <strong>수직(법선 방향)</strong>으로 작용하는 응력이다. 단면에 작용하는 수직력(N)에 의해 발생한다.</p>
+      <ul style="margin-left:20px; margin-bottom:14px;">
+        <li><span class="badge badge-blue">인장 (+)</span> 물체를 당기는 방향</li>
+        <li><span class="badge badge-red">압축 (−)</span> 물체를 누르는 방향</li>
+      </ul>
+    </div>
+    <div class="equation-box">
+      $$\sigma = \frac{F}{A}$$
+      <div style="font-size:0.75em; color:var(--text-light); margin-top:8px;">
+        σ : 수직응력 [Pa]<br>
+        F : 수직력 [N]&nbsp;&nbsp;·&nbsp;&nbsp;A : 단면적 [m²]
+      </div>
+    </div>
+  </div>
+
+  <!-- 수직응력 다이어그램 -->
+  <div class="diagram-container">
+    <svg viewBox="0 0 780 220" xmlns="http://www.w3.org/2000/svg" style="max-width:680px;">
+      <defs>
+        <marker id="aRed" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+          <polygon points="0 0,10 3.5,0 7" fill="#dc2626"/>
+        </marker>
+        <marker id="aRedL" markerWidth="10" markerHeight="7" refX="0" refY="3.5" orient="auto">
+          <polygon points="10 0,0 3.5,10 7" fill="#dc2626"/>
+        </marker>
+        <marker id="aBlue" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+          <polygon points="0 0,10 3.5,0 7" fill="#2563eb"/>
+        </marker>
+        <marker id="aBlueL" markerWidth="10" markerHeight="7" refX="0" refY="3.5" orient="auto">
+          <polygon points="10 0,0 3.5,10 7" fill="#2563eb"/>
+        </marker>
+      </defs>
+
+      <!-- TENSION (left) -->
+      <text x="195" y="24" text-anchor="middle" font-size="15" font-weight="700" fill="#2563eb">인장 (Tension)</text>
+      <!-- reference shape (before deformation, faint) -->
+      <rect x="120" y="65" width="150" height="50" rx="4" fill="none" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="6,4" opacity="0.45"/>
+      <!-- deformed shape (animated) -->
+      <rect x="100" y="60" width="190" height="60" rx="4" fill="#dbeafe" stroke="#2563eb" stroke-width="2" class="anim-stretch"/>
+      <line x1="50" y1="90" x2="98" y2="90" stroke="#dc2626" stroke-width="2.5" marker-start="url(#aRedL)"/>
+      <line x1="292" y1="90" x2="340" y2="90" stroke="#dc2626" stroke-width="2.5" marker-end="url(#aRed)"/>
+      <text x="40" y="80" fill="#dc2626" font-size="13" font-weight="600">F</text>
+      <text x="344" y="80" fill="#dc2626" font-size="13" font-weight="600">F</text>
+      <!-- stress arrows inside -->
+      <line x1="195" y1="72" x2="195" y2="108" stroke="#7c3aed" stroke-width="1.5" stroke-dasharray="5,3"/>
+      <text x="195" y="140" text-anchor="middle" fill="#2563eb" font-size="13">σ &gt; 0 (인장)</text>
+
+      <!-- COMPRESSION (right) -->
+      <text x="585" y="24" text-anchor="middle" font-size="15" font-weight="700" fill="#dc2626">압축 (Compression)</text>
+      <!-- reference shape (before deformation, faint) -->
+      <rect x="510" y="65" width="150" height="50" rx="4" fill="none" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="6,4" opacity="0.45"/>
+      <!-- deformed shape (animated) -->
+      <rect x="490" y="60" width="190" height="60" rx="4" fill="#fee2e2" stroke="#dc2626" stroke-width="2" class="anim-compress"/>
+      <line x1="440" y1="90" x2="488" y2="90" stroke="#dc2626" stroke-width="2.5" marker-end="url(#aRed)"/>
+      <line x1="730" y1="90" x2="682" y2="90" stroke="#dc2626" stroke-width="2.5" marker-end="url(#aRed)"/>
+      <text x="428" y="80" fill="#dc2626" font-size="13" font-weight="600">F</text>
+      <text x="734" y="80" fill="#dc2626" font-size="13" font-weight="600">F</text>
+      <line x1="585" y1="72" x2="585" y2="108" stroke="#7c3aed" stroke-width="1.5" stroke-dasharray="5,3"/>
+      <text x="585" y="140" text-anchor="middle" fill="#dc2626" font-size="13">σ &lt; 0 (압축)</text>
+
+      <!-- Normal direction arrows -->
+      <g>
+        <text x="195" y="185" text-anchor="middle" fill="#555" font-size="12">힘 방향 ⊥ 단면</text>
+        <text x="585" y="185" text-anchor="middle" fill="#555" font-size="12">힘 방향 ⊥ 단면</text>
+      </g>
+    </svg>
+    <div class="diagram-caption">그림 1-2. 수직응력: 인장(σ &gt; 0)과 압축(σ &lt; 0)</div>
+  </div>
+
+  <!-- ===== 전단응력 ===== -->
+  <h3 id="shear-stress">1.2 전단응력 (Shear Stress, τ)</h3>
+
+  <div class="grid-2">
+    <div>
+      <p>가상의 단면에 <strong>평행(접선 방향)</strong>으로 작용하는 응력이다. 단면에 작용하는 전단력(V)에 의해 발생한다.</p>
+      <p>전단응력은 물체를 <em>미끄러뜨리려는</em> 방향으로 작용한다.</p>
+    </div>
+    <div class="equation-box">
+      $$\tau = \frac{V}{A}$$
+      <div style="font-size:0.75em; color:var(--text-light); margin-top:8px;">
+        τ : 전단응력 [Pa]<br>
+        V : 전단력 [N]&nbsp;&nbsp;·&nbsp;&nbsp;A : 단면적 [m²]
+      </div>
+    </div>
+  </div>
+
+  <!-- 전단응력 다이어그램 -->
+  <div class="diagram-container">
+    <svg viewBox="0 0 600 260" xmlns="http://www.w3.org/2000/svg" style="max-width:520px;">
+      <defs>
+        <marker id="aGreen" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+          <polygon points="0 0,10 3.5,0 7" fill="#059669"/>
+        </marker>
+        <marker id="aGreenD" markerWidth="10" markerHeight="7" refX="3.5" refY="10" orient="auto-start-reverse">
+          <polygon points="0 0,3.5 10,7 0" fill="#059669"/>
+        </marker>
+      </defs>
+
+      <!-- Block -->
+      <g class="anim-shear">
+        <polygon points="140,60 460,60 460,180 140,180" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
+      </g>
+      <!-- Fixed bottom line -->
+      <line x1="120" y1="180" x2="480" y2="180" stroke="#6b7280" stroke-width="3"/>
+      <!-- Hatching -->
+      <g stroke="#9ca3af" stroke-width="1">
+        <line x1="140" y1="183" x2="128" y2="195"/>
+        <line x1="170" y1="183" x2="158" y2="195"/>
+        <line x1="200" y1="183" x2="188" y2="195"/>
+        <line x1="230" y1="183" x2="218" y2="195"/>
+        <line x1="260" y1="183" x2="248" y2="195"/>
+        <line x1="290" y1="183" x2="278" y2="195"/>
+        <line x1="320" y1="183" x2="308" y2="195"/>
+        <line x1="350" y1="183" x2="338" y2="195"/>
+        <line x1="380" y1="183" x2="368" y2="195"/>
+        <line x1="410" y1="183" x2="398" y2="195"/>
+        <line x1="440" y1="183" x2="428" y2="195"/>
+        <line x1="470" y1="183" x2="458" y2="195"/>
+      </g>
+
+      <!-- Top force V -->
+      <line x1="300" y1="50" x2="420" y2="50" stroke="#dc2626" stroke-width="3" marker-end="url(#aRed)" class="arrow-pulse"/>
+      <text x="370" y="40" fill="#dc2626" font-size="15" font-weight="700">V</text>
+
+      <!-- Shear plane arrows (internal) -->
+      <line x1="170" y1="120" x2="240" y2="120" stroke="#059669" stroke-width="2" marker-end="url(#aGreen)"/>
+      <line x1="280" y1="120" x2="350" y2="120" stroke="#059669" stroke-width="2" marker-end="url(#aGreen)"/>
+      <line x1="390" y1="120" x2="440" y2="120" stroke="#059669" stroke-width="2" marker-end="url(#aGreen)"/>
+
+      <!-- Labels -->
+      <text x="300" y="138" text-anchor="middle" fill="#059669" font-size="13" font-weight="600">τ (전단응력)</text>
+      <text x="300" y="230" text-anchor="middle" fill="#555" font-size="13">힘 방향 ∥ 단면 (접선 방향)</text>
+    </svg>
+    <div class="diagram-caption">그림 1-3. 전단응력: 단면에 평행하게 작용하는 응력</div>
+  </div>
+
+  <!-- ===== 수직 vs 전단 비교 ===== -->
+  <div class="vs-container">
+    <div class="vs-left">
+      <div class="vs-title" style="color:#2563eb;">수직응력 (σ)</div>
+      <ul style="list-style:none; padding:0;">
+        <li>▸ 단면에 <strong>수직</strong> 방향</li>
+        <li>▸ 길이 변화를 유발</li>
+        <li>▸ 인장(+) / 압축(−)</li>
+        <li>▸ σ = F / A</li>
+      </ul>
+    </div>
+    <div class="vs-right">
+      <div class="vs-title" style="color:#dc2626;">전단응력 (τ)</div>
+      <ul style="list-style:none; padding:0;">
+        <li>▸ 단면에 <strong>평행</strong> 방향</li>
+        <li>▸ 형상(각도) 변화를 유발</li>
+        <li>▸ 미끄러짐 방향</li>
+        <li>▸ τ = V / A</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="callout">
+    <strong>주의 — 응력과 변형률의 커플링:</strong>
+    위 비교에서 "수직응력 → 길이 변화", "전단응력 → 각도 변화"는
+    <strong>등방성(isotropic) 재료</strong>에서의 관계이다.
+    <strong>비등방성(anisotropic) 재료</strong>에서는 수직응력이 각도 변화(전단변형률)를,
+    전단응력이 길이 변화(수직변형률)를 유발할 수 있다.
+    이를 <strong>인장–전단 커플링(Extension–Shear Coupling)</strong>이라 한다.
+    <br><br>
+    <strong>실제 예시:</strong>
+    <ul style="margin:8px 0 0 18px;">
+      <li><strong>복합재료(CFRP 등)</strong>를 섬유 방향과 다른 각도로 하중을 가하면, 인장력만 가했는데도 비틀림(전단변형)이 동시에 발생한다.</li>
+      <li><strong>단결정 금속</strong>(삼사정계·단사정계 결정구조)에서 대칭성이 낮아 커플링이 나타난다.</li>
+      <li><strong>목재</strong>를 결 방향이 아닌 각도로 하중을 가할 때에도 유사한 현상이 관찰된다.</li>
+    </ul>
+    <br>
+    일반화된 Hooke 법칙의 순응도 행렬(Compliance Matrix)로 표현하면:
+    <div style="text-align:center; margin:12px 0 4px;">
+      $$\begin{bmatrix} \varepsilon_{1} \\ \varepsilon_{2} \\ \gamma_{12} \end{bmatrix}
+      = \begin{bmatrix} S_{11} & S_{12} & \boldsymbol{S_{16}} \\ S_{12} & S_{22} & \boldsymbol{S_{26}} \\ \boldsymbol{S_{16}} & \boldsymbol{S_{26}} & S_{66} \end{bmatrix}
+      \begin{bmatrix} \sigma_{1} \\ \sigma_{2} \\ \tau_{12} \end{bmatrix}$$
+    </div>
+    <div style="font-size:0.9em; color:#555; text-align:center;">
+      등방성 재료: $S_{16} = S_{26} = 0$ (커플링 없음) &nbsp;|&nbsp;
+      비등방성 재료: $S_{16}, S_{26} \neq 0$ (커플링 발생)
+    </div>
+  </div>
+
+  <!-- ===== 단위 ===== -->
+  <h3>1.3 응력의 단위</h3>
+  <table>
+    <thead>
+      <tr><th>단위</th><th>표기</th><th>비고</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>파스칼 (Pa)</td><td>1 Pa = 1 N/m²</td><td>SI 기본 단위</td></tr>
+      <tr><td>킬로파스칼 (kPa)</td><td>1 kPa = 10³ Pa</td><td>토목 분야에서 자주 사용</td></tr>
+      <tr><td>메가파스칼 (MPa)</td><td>1 MPa = 10⁶ Pa = 1 N/mm²</td><td>기계·재료 분야에서 가장 일반적</td></tr>
+      <tr><td>기가파스칼 (GPa)</td><td>1 GPa = 10⁹ Pa</td><td>탄성계수 등에 사용</td></tr>
+    </tbody>
+  </table>
+
+  <!-- 단위 스케일 시각화 -->
+  <div class="diagram-container">
+    <svg viewBox="0 0 800 120" xmlns="http://www.w3.org/2000/svg" style="max-width:700px;">
+      <!-- Scale bar -->
+      <line x1="60" y1="60" x2="740" y2="60" stroke="#cbd5e1" stroke-width="3"/>
+      <!-- Ticks and labels -->
+      <g font-size="13" text-anchor="middle">
+        <circle cx="100" cy="60" r="8" fill="#93c5fd"/>
+        <text x="100" y="42" fill="#2563eb" font-weight="600">Pa</text>
+        <text x="100" y="88" fill="#555" font-size="11">1</text>
+
+        <circle cx="300" cy="60" r="10" fill="#60a5fa"/>
+        <text x="300" y="42" fill="#2563eb" font-weight="600">kPa</text>
+        <text x="300" y="88" fill="#555" font-size="11">10³</text>
+
+        <circle cx="500" cy="60" r="13" fill="#3b82f6"/>
+        <text x="500" y="38" fill="#2563eb" font-weight="700">MPa</text>
+        <text x="500" y="88" fill="#555" font-size="11">10⁶</text>
+
+        <circle cx="700" cy="60" r="16" fill="#1d4ed8"/>
+        <text x="700" y="34" fill="#1e3a8a" font-weight="700">GPa</text>
+        <text x="700" y="88" fill="#555" font-size="11">10⁹</text>
+      </g>
+      <!-- Arrows between -->
+      <text x="200" y="60" text-anchor="middle" fill="#9ca3af" font-size="18">×10³</text>
+      <text x="400" y="60" text-anchor="middle" fill="#9ca3af" font-size="18">×10³</text>
+      <text x="600" y="60" text-anchor="middle" fill="#9ca3af" font-size="18">×10³</text>
+    </svg>
+    <div class="diagram-caption">그림 1-4. 응력 단위 스케일 비교</div>
+  </div>
+
+  <!-- ===== 응력 정의 이유 ===== -->
+  <h3>1.4 응력을 정의하는 이유</h3>
+
+  <div class="callout callout-blue">
+    <strong>핵심:</strong> 힘(하중)만으로는 물체 내부의 상태를 충분히 표현할 수 없다.
+    같은 힘이라도 <strong>작용하는 면적</strong>에 따라 물체가 받는 영향이 달라지기 때문에,
+    <strong>단위 면적당 내력</strong> 즉 응력으로 정의해야 한다.
+  </div>
+
+  <!-- 면적 비교 다이어그램 -->
+  <div class="diagram-container">
+    <svg viewBox="0 0 800 300" xmlns="http://www.w3.org/2000/svg" style="max-width:700px;">
+      <!-- Case 1: Small area -->
+      <text x="200" y="22" text-anchor="middle" font-size="15" font-weight="700" fill="#dc2626">작은 면적</text>
+      <line x1="200" y1="36" x2="200" y2="68" stroke="#dc2626" stroke-width="2.5" marker-end="url(#aRed)" class="arrow-pulse"/>
+      <text x="220" y="58" fill="#dc2626" font-size="13" font-weight="600">F</text>
+      <rect x="155" y="70" width="90" height="140" rx="3" fill="#fee2e2" stroke="#dc2626" stroke-width="2"/>
+      <text x="200" y="148" text-anchor="middle" fill="#dc2626" font-size="30" font-weight="700">σ ↑</text>
+      <text x="200" y="235" text-anchor="middle" fill="#555" font-size="12">A = 작다</text>
+      <text x="200" y="255" text-anchor="middle" fill="#dc2626" font-size="13" font-weight="600">→ 높은 응력</text>
+      <text x="200" y="278" text-anchor="middle" fill="#dc2626" font-size="12">→ 파괴 위험!</text>
+
+      <!-- Case 2: Large area -->
+      <text x="560" y="22" text-anchor="middle" font-size="15" font-weight="700" fill="#059669">큰 면적</text>
+      <line x1="560" y1="36" x2="560" y2="68" stroke="#dc2626" stroke-width="2.5" marker-end="url(#aRed)" class="arrow-pulse"/>
+      <text x="585" y="58" fill="#dc2626" font-size="13" font-weight="600">F (동일)</text>
+      <rect x="460" y="70" width="200" height="140" rx="3" fill="#d1fae5" stroke="#059669" stroke-width="2"/>
+      <text x="560" y="148" text-anchor="middle" fill="#059669" font-size="30" font-weight="700">σ ↓</text>
+      <text x="560" y="235" text-anchor="middle" fill="#555" font-size="12">A = 크다</text>
+      <text x="560" y="255" text-anchor="middle" fill="#059669" font-size="13" font-weight="600">→ 낮은 응력</text>
+      <text x="560" y="278" text-anchor="middle" fill="#059669" font-size="12">→ 안전!</text>
+
+      <!-- Same F note -->
+      <text x="380" y="148" text-anchor="middle" fill="#555" font-size="14" font-weight="600">같은 F</text>
+      <text x="380" y="168" text-anchor="middle" fill="#555" font-size="14" font-weight="600">다른 σ</text>
+    </svg>
+    <div class="diagram-caption">그림 1-5. 같은 힘이라도 면적에 따라 응력이 달라진다</div>
+  </div>
+
+  <p>미소면적(또는 미소체적) 관점에서 응력을 정의하면 물체 내부 임의의 점에서의 상태를 정확하게 기술할 수 있다.</p>
+
+</section>
+
+<!-- ============================================================ -->
+<!--                  SECTION 2 : 변형률                           -->
+<!-- ============================================================ -->
+<section id="sec-strain">
+  <h2><span class="num">2</span> 변형률 (Strain)</h2>
+
+  <div class="card card-accent">
+    <p><strong>변형 (Deformation)</strong>: 하중(외력 또는 외부 조건)에 의해 발생한 상대적 변위에 따른 길이 변화 또는 형상 변화</p>
+    <p style="margin-bottom:0;"><strong>변형률 (Strain)</strong>: <span class="key">단위길이당 변형량</span></p>
+  </div>
+
+  <!-- ===== 수직변형률 ===== -->
+  <h3>2.1 수직변형률 (Normal Strain, ε)</h3>
+
+  <p>길이 변화와 관련된 변형률로, 수직 성분이다.</p>
+
+  <div class="equation-box">
+    $$\varepsilon = \frac{\delta}{L} = \frac{\text{변형량(길이 변화)}}{\text{원래 길이}}$$
+    <div style="font-size:0.75em; color:var(--text-light); margin-top:8px;">단위: 무차원 (mm/mm, m/m) — 흔히 με (micro-strain, 10⁻⁶) 사용</div>
+  </div>
+
+  <!-- 수직변형률 다이어그램 -->
+  <div class="diagram-container">
+    <svg viewBox="0 0 800 320" xmlns="http://www.w3.org/2000/svg" style="max-width:700px;">
+      <defs>
+        <marker id="dimArrowR" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+          <polygon points="0 0,8 3,0 6" fill="#555"/>
+        </marker>
+        <marker id="dimArrowL" markerWidth="8" markerHeight="6" refX="0" refY="3" orient="auto">
+          <polygon points="8 0,0 3,8 6" fill="#555"/>
+        </marker>
+      </defs>
+
+      <!-- BEFORE -->
+      <text x="200" y="30" text-anchor="middle" font-size="15" font-weight="700" fill="#2563eb">변형 전 (Before)</text>
+      <rect x="60" y="50" width="280" height="55" rx="4" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
+
+      <!-- L dimension -->
+      <line x1="60" y1="125" x2="60" y2="135" stroke="#555" stroke-width="1"/>
+      <line x1="340" y1="125" x2="340" y2="135" stroke="#555" stroke-width="1"/>
+      <line x1="60" y1="130" x2="340" y2="130" stroke="#555" stroke-width="1.5" marker-start="url(#dimArrowL)" marker-end="url(#dimArrowR)"/>
+      <text x="200" y="150" text-anchor="middle" fill="#555" font-size="14" font-weight="600">L (원래 길이)</text>
+
+      <!-- AFTER -->
+      <text x="230" y="190" text-anchor="middle" font-size="15" font-weight="700" fill="#dc2626">변형 후 (After)</text>
+      <rect x="60" y="210" width="340" height="55" rx="4" fill="#fef2f2" stroke="#dc2626" stroke-width="2" class="anim-stretch-delta"/>
+
+      <!-- L+δ dimension -->
+      <line x1="60" y1="285" x2="60" y2="295" stroke="#555" stroke-width="1"/>
+      <line x1="400" y1="285" x2="400" y2="295" stroke="#555" stroke-width="1"/>
+      <line x1="60" y1="290" x2="400" y2="290" stroke="#555" stroke-width="1.5" marker-start="url(#dimArrowL)" marker-end="url(#dimArrowR)"/>
+      <text x="230" y="310" text-anchor="middle" fill="#555" font-size="14" font-weight="600">L + δ</text>
+
+      <!-- δ brace -->
+      <rect x="340" y="210" width="60" height="55" fill="#fbbf2433" stroke="#f59e0b" stroke-width="2" stroke-dasharray="6,3"/>
+      <text x="370" y="242" text-anchor="middle" fill="#f59e0b" font-size="15" font-weight="700">δ</text>
+
+      <!-- Force arrows -->
+      <line x1="402" y1="237" x2="460" y2="237" stroke="#dc2626" stroke-width="2.5" marker-end="url(#aRed)" class="arrow-pulse"/>
+      <text x="470" y="235" fill="#dc2626" font-size="13" font-weight="600">F</text>
+
+      <!-- Equation reminder -->
+      <text x="600" y="80" fill="#2563eb" font-size="16" font-weight="700">ε = δ / L</text>
+      <rect x="576" y="60" width="130" height="30" rx="8" fill="none" stroke="#2563eb" stroke-width="1.5"/>
+
+      <!-- Examples -->
+      <text x="600" y="130" fill="#555" font-size="12">예시:</text>
+      <text x="600" y="150" fill="#555" font-size="12">L = 100 mm, δ = 0.2 mm</text>
+      <text x="600" y="170" fill="#555" font-size="12">ε = 0.002 = 2000 με</text>
+    </svg>
+    <div class="diagram-caption">그림 2-1. 수직변형률: 변형 전/후 길이 변화</div>
+  </div>
+
+  <!-- ===== 전단변형률 ===== -->
+  <h3>2.2 전단변형률 (Shear Strain, γ)</h3>
+
+  <p>각도 변화와 관련된 변형률로, 전단 성분이다. 형상 변화(뒤틀림)를 나타낸다.</p>
+
+  <div class="equation-box">
+    $$\gamma = \tan\phi \approx \phi \quad (\text{미소 변형 시})$$
+    <div style="font-size:0.75em; color:var(--text-light); margin-top:8px;">단위: 라디안(rad) — 무차원</div>
+  </div>
+
+  <!-- 전단변형률 다이어그램 -->
+  <div class="diagram-container">
+    <svg viewBox="0 0 800 300" xmlns="http://www.w3.org/2000/svg" style="max-width:700px;">
+      <!-- BEFORE -->
+      <text x="180" y="28" text-anchor="middle" font-size="15" font-weight="700" fill="#2563eb">변형 전</text>
+      <rect x="60" y="40" width="240" height="180" rx="2" fill="#dbeafe" stroke="#2563eb" stroke-width="2" fill-opacity="0.5"/>
+      <text x="180" y="140" text-anchor="middle" fill="#2563eb" font-size="16">□</text>
+      <!-- 90 degree marker -->
+      <rect x="60" y="190" width="25" height="25" fill="none" stroke="#2563eb" stroke-width="1.5"/>
+      <text x="100" y="248" fill="#2563eb" font-size="12">90°</text>
+
+      <!-- Arrow between -->
+      <text x="380" y="128" font-size="28" fill="#9ca3af">→</text>
+      <text x="370" y="155" fill="#555" font-size="12">전단력</text>
+
+      <!-- AFTER -->
+      <text x="630" y="28" text-anchor="middle" font-size="15" font-weight="700" fill="#dc2626">변형 후</text>
+      <polygon points="480,220 510,40 750,40 720,220" fill="#fef2f2" stroke="#dc2626" stroke-width="2" fill-opacity="0.7"/>
+
+      <!-- Force arrow top -->
+      <line x1="620" y1="35" x2="710" y2="35" stroke="#dc2626" stroke-width="2.5" marker-end="url(#aRed)" class="arrow-pulse"/>
+      <text x="672" y="26" fill="#dc2626" font-size="13" font-weight="700">V</text>
+
+      <!-- Angle φ — vertical reference line from bottom-left vertex -->
+      <path d="M 480,220 L 480,140" stroke="#2563eb" stroke-width="1.5" stroke-dasharray="5,3"/>
+      <!-- Arc from vertical to slanted edge, centered at (480,220), radius 55 -->
+      <path d="M 480,165 A 55,55 0 0,1 489,166" stroke="#f59e0b" stroke-width="2.5" fill="none"/>
+      <text x="494" y="160" fill="#f59e0b" font-size="15" font-weight="700">φ</text>
+
+      <!-- γ label -->
+      <text x="600" y="240" text-anchor="middle" fill="#059669" font-size="15" font-weight="700">γ ≈ φ</text>
+      <text x="600" y="264" text-anchor="middle" fill="#555" font-size="12">(각도 변화 = 전단변형률)</text>
+    </svg>
+    <div class="diagram-caption">그림 2-2. 전단변형률: 직각의 변화량 (각도 φ)</div>
+  </div>
+
+  <!-- ===== 변형률 정의 이유 ===== -->
+  <h3>2.3 변형률을 정의하는 이유</h3>
+
+  <div class="callout callout-blue">
+    <strong>핵심:</strong> 변형량(절대적인 길이 변화)만으로는 물체의 변형 상태를 충분히 표현할 수 없다.
+    같은 변형량이라도 <strong>원래 길이</strong>에 따라 의미가 다르기 때문에,
+    <strong>단위길이당 변형량</strong> 즉 변형률로 정의해야 한다.
+  </div>
+
+  <!-- 비유 다이어그램 -->
+  <div class="diagram-container">
+    <svg viewBox="0 0 800 200" xmlns="http://www.w3.org/2000/svg" style="max-width:700px;">
+      <!-- Short bar (left) -->
+      <text x="170" y="22" text-anchor="middle" font-size="14" font-weight="700" fill="#dc2626">짧은 봉</text>
+      <rect x="80" y="36" width="150" height="38" rx="3" fill="#fee2e2" stroke="#dc2626" stroke-width="2"/>
+      <rect x="230" y="36" width="30" height="38" rx="3" fill="#fbbf2433" stroke="#f59e0b" stroke-width="2" stroke-dasharray="5,3"/>
+      <text x="245" y="60" text-anchor="middle" fill="#f59e0b" font-size="13" font-weight="700">δ</text>
+      <text x="170" y="96" text-anchor="middle" fill="#555" font-size="12">L = 100 mm</text>
+      <text x="170" y="116" text-anchor="middle" fill="#dc2626" font-size="14" font-weight="700">ε = 1/100 = 0.01</text>
+      <text x="170" y="136" text-anchor="middle" fill="#dc2626" font-size="12">→ 큰 변형률!</text>
+
+      <!-- Long bar (right) -->
+      <text x="560" y="22" text-anchor="middle" font-size="14" font-weight="700" fill="#059669">긴 봉</text>
+      <rect x="410" y="36" width="270" height="38" rx="3" fill="#d1fae5" stroke="#059669" stroke-width="2"/>
+      <rect x="680" y="36" width="30" height="38" rx="3" fill="#fbbf2433" stroke="#f59e0b" stroke-width="2" stroke-dasharray="5,3"/>
+      <text x="695" y="60" text-anchor="middle" fill="#f59e0b" font-size="13" font-weight="700">δ</text>
+      <text x="560" y="96" text-anchor="middle" fill="#555" font-size="12">L = 10,000 mm</text>
+      <text x="560" y="116" text-anchor="middle" fill="#059669" font-size="14" font-weight="700">ε = 1/10000 = 0.0001</text>
+      <text x="560" y="136" text-anchor="middle" fill="#059669" font-size="12">→ 작은 변형률</text>
+
+      <!-- Same δ note (center) -->
+      <text x="360" y="170" text-anchor="middle" fill="#555" font-size="13" font-weight="600">같은 δ = 1 mm</text>
+      <text x="360" y="190" text-anchor="middle" fill="#555" font-size="13">하지만 다른 ε!</text>
+    </svg>
+    <div class="diagram-caption">그림 2-3. 같은 변형량이라도 원래 길이에 따라 변형률이 다르다</div>
+  </div>
+
+  <!-- ===== 요약표 ===== -->
+  <h3>2.4 요약 — 응력과 변형률의 성분 분류</h3>
+
+  <table>
+    <thead>
+      <tr><th>구분</th><th>수직 성분</th><th>전단 성분</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>응력</strong></td>
+        <td>수직응력 <strong>σ</strong> (법선 방향) — 주로 길이 변화 유발*</td>
+        <td>전단응력 <strong>τ</strong> (접선 방향) — 주로 형상(각도) 변화 유발*</td>
+      </tr>
+      <tr>
+        <td><strong>변형률</strong></td>
+        <td>수직변형률 <strong>ε</strong> = δ/L (길이 변화)</td>
+        <td>전단변형률 <strong>γ</strong> ≈ φ (각도 변화)</td>
+      </tr>
+    </tbody>
+  </table>
+  <p style="font-size:0.88em; color:var(--text-light); margin-top:-12px;">
+    *등방성 재료 기준. 비등방성 재료(복합재, 단결정 등)에서는 σ→γ, τ→ε 커플링이 발생할 수 있음 (§1.2 참조)
+  </p>
+
+  <!-- 4분면 다이어그램 -->
+  <div class="diagram-container">
+    <svg viewBox="0 0 700 360" xmlns="http://www.w3.org/2000/svg" style="max-width:600px;">
+      <!-- Grid -->
+      <line x1="350" y1="20" x2="350" y2="340" stroke="#e2e8f0" stroke-width="2"/>
+      <line x1="30" y1="180" x2="670" y2="180" stroke="#e2e8f0" stroke-width="2"/>
+
+      <!-- Headers -->
+      <text x="190" y="18" text-anchor="middle" font-size="16" font-weight="700" fill="#2563eb">수직 성분</text>
+      <text x="520" y="18" text-anchor="middle" font-size="16" font-weight="700" fill="#7c3aed">전단 성분</text>
+
+      <!-- Q1: Normal Stress -->
+      <rect x="50" y="30" width="280" height="140" rx="10" fill="#eff6ff" stroke="#2563eb" stroke-width="1.5"/>
+      <text x="190" y="60" text-anchor="middle" font-size="14" font-weight="700" fill="#2563eb">수직응력 σ</text>
+      <text x="190" y="82" text-anchor="middle" font-size="12" fill="#555">단면에 수직으로 작용</text>
+      <!-- mini diagram: bar with perpendicular arrows (longer shafts) -->
+      <rect x="150" y="98" width="80" height="24" rx="3" fill="#93c5fd"/>
+      <line x1="100" y1="110" x2="148" y2="110" stroke="#dc2626" stroke-width="2" marker-start="url(#aRedL)"/>
+      <line x1="232" y1="110" x2="280" y2="110" stroke="#dc2626" stroke-width="2" marker-end="url(#aRed)"/>
+      <text x="190" y="155" text-anchor="middle" font-size="13" fill="#2563eb" font-weight="600">σ = F/A</text>
+
+      <!-- Q2: Shear Stress (moment equilibrium — arrows on all 4 faces) -->
+      <rect x="370" y="30" width="280" height="140" rx="10" fill="#f5f3ff" stroke="#7c3aed" stroke-width="1.5"/>
+      <text x="510" y="60" text-anchor="middle" font-size="14" font-weight="700" fill="#7c3aed">전단응력 τ</text>
+      <text x="510" y="82" text-anchor="middle" font-size="12" fill="#555">단면에 평행 (모멘트 평형)</text>
+      <!-- mini diagram: square element with shear stress on all 4 faces -->
+      <rect x="480" y="92" width="50" height="50" rx="2" fill="#c4b5fd" stroke="#7c3aed" stroke-width="1.5"/>
+      <!-- Top face: rightward -->
+      <line x1="490" y1="89" x2="530" y2="89" stroke="#dc2626" stroke-width="1.8" marker-end="url(#aRed)"/>
+      <!-- Bottom face: leftward -->
+      <line x1="520" y1="145" x2="480" y2="145" stroke="#dc2626" stroke-width="1.8" marker-end="url(#aRed)"/>
+      <!-- Right face: upward (CCW moment to balance top/bottom CW) -->
+      <line x1="533" y1="136" x2="533" y2="96" stroke="#dc2626" stroke-width="1.8" marker-end="url(#aRed)"/>
+      <!-- Left face: downward (CCW moment to balance top/bottom CW) -->
+      <line x1="477" y1="98" x2="477" y2="138" stroke="#dc2626" stroke-width="1.8" marker-end="url(#aRed)"/>
+      <text x="510" y="157" text-anchor="middle" font-size="13" fill="#7c3aed" font-weight="600">τ = V/A</text>
+
+      <!-- Q3: Normal Strain -->
+      <rect x="50" y="190" width="280" height="140" rx="10" fill="#eff6ff" stroke="#2563eb" stroke-width="1.5"/>
+      <text x="190" y="218" text-anchor="middle" font-size="14" font-weight="700" fill="#2563eb">수직변형률 ε</text>
+      <text x="190" y="240" text-anchor="middle" font-size="12" fill="#555">길이 변화</text>
+      <!-- mini diagram -->
+      <rect x="130" y="255" width="80" height="20" rx="3" fill="#93c5fd"/>
+      <rect x="130" y="280" width="100" height="20" rx="3" fill="#fca5a5" stroke-dasharray="4,2" stroke="#dc2626" stroke-width="1"/>
+      <text x="230" y="268" fill="#2563eb" font-size="11">L</text>
+      <text x="240" y="294" fill="#dc2626" font-size="11">L+δ</text>
+      <text x="190" y="318" text-anchor="middle" font-size="13" fill="#2563eb" font-weight="600">ε = δ/L</text>
+
+      <!-- Q4: Shear Strain -->
+      <rect x="370" y="190" width="280" height="140" rx="10" fill="#f5f3ff" stroke="#7c3aed" stroke-width="1.5"/>
+      <text x="510" y="218" text-anchor="middle" font-size="14" font-weight="700" fill="#7c3aed">전단변형률 γ</text>
+      <text x="510" y="240" text-anchor="middle" font-size="12" fill="#555">각도 변화</text>
+      <!-- mini diagram: original rect (dashed) -->
+      <rect x="470" y="255" width="60" height="50" rx="2" fill="none" stroke="#93c5fd" stroke-width="1.5" stroke-dasharray="4,2"/>
+      <!-- deformed parallelogram -->
+      <polygon points="470,305 483,255 543,255 530,305" fill="#c4b5fd" fill-opacity="0.5" stroke="#7c3aed" stroke-width="1.5"/>
+      <!-- vertical reference from bottom-left -->
+      <line x1="470" y1="305" x2="470" y2="256" stroke="#2563eb" stroke-width="1" stroke-dasharray="3,2"/>
+      <!-- arc at bottom-left corner -->
+      <path d="M 470,270 A 35,35 0 0,1 479,271" stroke="#f59e0b" stroke-width="2" fill="none"/>
+      <text x="482" y="266" fill="#f59e0b" font-size="11" font-weight="700">φ</text>
+      <text x="510" y="318" text-anchor="middle" font-size="13" fill="#7c3aed" font-weight="600">γ ≈ φ</text>
+
+      <!-- Row labels -->
+      <text x="20" y="105" fill="#555" font-size="12" font-weight="600" transform="rotate(-90 20 105)">응력</text>
+      <text x="20" y="265" fill="#555" font-size="12" font-weight="600" transform="rotate(-90 20 265)">변형률</text>
+    </svg>
+    <div class="diagram-caption">그림 2-4. 응력과 변형률의 4분면 요약</div>
+  </div>
+
+</section>
+
+<!-- ============================================================ -->
+<!--            SECTION 3 : 재료의 기계적 성질                      -->
+<!-- ============================================================ -->
+<section id="sec-material">
+  <h2><span class="num">3</span> 재료의 기계적 성질 — 응력–변형률 선도</h2>
+
+  <!-- ===== 재료시험 ===== -->
+  <h3>3.1 재료시험의 종류</h3>
+
+  <div class="grid-2" style="grid-template-columns: repeat(3, 1fr);">
+    <div class="card" style="text-align:center;">
+      <svg viewBox="0 0 80 80" width="50" height="50">
+        <rect x="25" y="18" width="30" height="44" rx="2" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
+        <!-- upward arrow (pull up) -->
+        <line x1="40" y1="16" x2="40" y2="4" stroke="#dc2626" stroke-width="2.5"/>
+        <polygon points="35,8 40,1 45,8" fill="#dc2626"/>
+        <!-- downward arrow (pull down) -->
+        <line x1="40" y1="64" x2="40" y2="76" stroke="#dc2626" stroke-width="2.5"/>
+        <polygon points="35,72 40,79 45,72" fill="#dc2626"/>
+      </svg>
+      <div style="font-weight:600; margin-top:6px;">인장시험</div>
+      <div style="font-size:0.85em; color:#555;">Tensile Test</div>
+    </div>
+    <div class="card" style="text-align:center;">
+      <svg viewBox="0 0 80 80" width="50" height="50"><rect x="20" y="15" width="40" height="50" rx="2" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/><line x1="40" y1="5" x2="40" y2="15" stroke="#dc2626" stroke-width="2" marker-end="url(#aRed)"/><line x1="40" y1="65" x2="40" y2="75" stroke="#dc2626" stroke-width="2" marker-start="url(#aRedL)"/></svg>
+      <div style="font-weight:600; margin-top:6px;">압축시험</div>
+      <div style="font-size:0.85em; color:#555;">Compression</div>
+    </div>
+    <div class="card" style="text-align:center;">
+      <svg viewBox="0 0 80 80" width="50" height="50"><polygon points="20,20 60,20 55,60 25,60" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/><line x1="30" y1="17" x2="55" y2="17" stroke="#dc2626" stroke-width="2" marker-end="url(#aRed)"/></svg>
+      <div style="font-weight:600; margin-top:6px;">전단시험</div>
+      <div style="font-size:0.85em; color:#555;">Shear</div>
+    </div>
+  </div>
+  <div class="grid-2" style="grid-template-columns: repeat(3, 1fr); margin-top:0;">
+    <div class="card" style="text-align:center;">
+      <svg viewBox="0 0 80 80" width="50" height="50"><rect x="15" y="30" width="50" height="30" rx="2" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/><circle cx="40" cy="25" r="8" fill="#f59e0b" stroke="#b45309" stroke-width="1.5"/><line x1="40" y1="18" x2="40" y2="32" stroke="#b45309" stroke-width="1.5" marker-end="url(#aRed)"/></svg>
+      <div style="font-weight:600; margin-top:6px;">경도시험</div>
+      <div style="font-size:0.85em; color:#555;">Hardness</div>
+    </div>
+    <div class="card" style="text-align:center;">
+      <svg viewBox="0 0 80 80" width="50" height="50">
+        <!-- specimen bar (notched) -->
+        <rect x="10" y="50" width="60" height="8" rx="1" fill="#dbeafe" stroke="#2563eb" stroke-width="1.5"/>
+        <!-- notch (V-notch) -->
+        <path d="M 38,50 L 40,54 L 42,50" fill="#fff" stroke="#2563eb" stroke-width="1"/>
+        <!-- supports -->
+        <polygon points="18,60 22,60 20,66" fill="#9ca3af" stroke="#6b7280" stroke-width="1"/>
+        <polygon points="58,60 62,60 60,66" fill="#9ca3af" stroke="#6b7280" stroke-width="1"/>
+        <!-- hammer head -->
+        <rect x="30" y="18" width="20" height="12" rx="2" fill="#dc2626" stroke="#991b1b" stroke-width="1.5"/>
+        <!-- hammer handle -->
+        <line x1="40" y1="6" x2="40" y2="18" stroke="#92400e" stroke-width="3" stroke-linecap="round"/>
+        <!-- impact arrow -->
+        <line x1="40" y1="32" x2="40" y2="46" stroke="#dc2626" stroke-width="2"/>
+        <polygon points="36,43 40,49 44,43" fill="#dc2626"/>
+        <!-- impact burst lines -->
+        <line x1="32" y1="36" x2="26" y2="33" stroke="#f59e0b" stroke-width="1.5"/>
+        <line x1="48" y1="36" x2="54" y2="33" stroke="#f59e0b" stroke-width="1.5"/>
+      </svg>
+      <div style="font-weight:600; margin-top:6px;">충격시험</div>
+      <div style="font-size:0.85em; color:#555;">Impact</div>
+    </div>
+    <div class="card" style="text-align:center;">
+      <svg viewBox="0 0 80 80" width="50" height="50"><path d="M 15 50 Q 25 20 35 50 Q 45 20 55 50 Q 65 20 70 50" fill="none" stroke="#2563eb" stroke-width="2"/><rect x="20" y="52" width="40" height="10" rx="1" fill="#dbeafe" stroke="#2563eb" stroke-width="1.5"/></svg>
+      <div style="font-weight:600; margin-top:6px;">피로시험</div>
+      <div style="font-size:0.85em; color:#555;">Fatigue</div>
+    </div>
+  </div>
+
+  <div class="callout">
+    <strong>이 중 인장시험(Tensile Test)</strong>을 통해 응력–변형률 선도를 획득한다.
+    인장시험은 재료의 기계적 성질을 파악하는 가장 기본적이고 대표적인 실험이다.
+  </div>
+
+  <!-- ===== 인장시험 시편 ===== -->
+  <h3>3.2 인장시험 선도 → 응력–변형률 선도</h3>
+
+  <!-- 시편 다이어그램 -->
+  <div class="diagram-container">
+    <svg viewBox="0 0 800 240" xmlns="http://www.w3.org/2000/svg" style="max-width:700px;">
+      <defs>
+        <linearGradient id="specGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#a5b4fc"/>
+          <stop offset="100%" stop-color="#6366f1"/>
+        </linearGradient>
+      </defs>
+
+      <text x="400" y="24" text-anchor="middle" font-size="16" font-weight="700" fill="#4f46e5">인장시험 시편 (Tensile Test Specimen)</text>
+
+      <!-- Specimen shape (dog-bone) -->
+      <path d="M 80,80 L 80,160
+               Q 80,170 100,170 L 200,170
+               Q 230,170 240,150 L 250,140
+               Q 260,130 280,130 L 520,130
+               Q 540,130 550,140 L 560,150
+               Q 570,170 600,170 L 700,170
+               Q 720,170 720,160 L 720,80
+               Q 720,70 700,70 L 600,70
+               Q 570,70 560,90 L 550,100
+               Q 540,110 520,110 L 280,110
+               Q 260,110 250,100 L 240,90
+               Q 230,70 200,70 L 100,70
+               Q 80,70 80,80 Z"
+            fill="url(#specGrad)" stroke="#4338ca" stroke-width="2"/>
+
+      <!-- Gauge length markers -->
+      <line x1="280" y1="135" x2="280" y2="165" stroke="#dc2626" stroke-width="1.5"/>
+      <line x1="520" y1="135" x2="520" y2="165" stroke="#dc2626" stroke-width="1.5"/>
+      <line x1="280" y1="155" x2="520" y2="155" stroke="#dc2626" stroke-width="1.5" marker-start="url(#dimArrowL)" marker-end="url(#dimArrowR)"/>
+      <text x="400" y="180" text-anchor="middle" fill="#dc2626" font-size="13" font-weight="600">게이지 길이 (Gauge Length)</text>
+
+      <!-- Cross section labels -->
+      <line x1="400" y1="110" x2="400" y2="80" stroke="#f59e0b" stroke-width="1" stroke-dasharray="4,2"/>
+      <line x1="400" y1="130" x2="400" y2="160" stroke="#f59e0b" stroke-width="1" stroke-dasharray="4,2"/>
+
+      <!-- Annotation: narrow center -->
+      <path d="M 400,60 L 400,40" stroke="#059669" stroke-width="1"/>
+      <text x="400" y="36" text-anchor="middle" fill="#059669" font-size="11" font-weight="600">단면적이 작은 중심부</text>
+
+      <!-- Grip areas -->
+      <text x="140" y="60" text-anchor="middle" fill="#555" font-size="11">그립부</text>
+      <text x="660" y="60" text-anchor="middle" fill="#555" font-size="11">그립부</text>
+
+      <!-- Force arrows -->
+      <line x1="40" y1="120" x2="76" y2="120" stroke="#dc2626" stroke-width="3" marker-start="url(#aRedL)" class="arrow-pulse"/>
+      <line x1="724" y1="120" x2="760" y2="120" stroke="#dc2626" stroke-width="3" marker-end="url(#aRed)" class="arrow-pulse"/>
+      <text x="30" y="112" fill="#dc2626" font-size="13" font-weight="600">F</text>
+      <text x="764" y="112" fill="#dc2626" font-size="13" font-weight="600">F</text>
+
+      <!-- Note -->
+      <text x="400" y="212" text-anchor="middle" fill="#555" font-size="12" font-style="italic">
+        시편 중심부의 단면적이 양 끝보다 작은 이유:
+      </text>
+      <text x="400" y="230" text-anchor="middle" fill="#555" font-size="12" font-style="italic">
+        파단이 반드시 중심(게이지 구간) 내에서 발생하도록 유도하기 위함
+      </text>
+    </svg>
+    <div class="diagram-caption">그림 3-1. 인장시험 시편의 구조</div>
+  </div>
+
+  <!-- Load-Elongation vs Stress-Strain -->
+  <div class="vs-container">
+    <div class="vs-left">
+      <div class="vs-title" style="color:#2563eb;">하중–변형 선도</div>
+      <p style="font-size:0.95em;">(Load–Elongation)</p>
+      <ul style="list-style:none; padding:0; font-size:0.95em;">
+        <li>▸ 시편의 치수에 <strong>의존</strong></li>
+        <li>▸ 재료 고유 특성을 나타내지 못함</li>
+        <li>▸ 축: P (하중) vs δ (변형량)</li>
+      </ul>
+    </div>
+    <div class="vs-right" style="background:#f0fdf4; border-color:#059669;">
+      <div class="vs-title" style="color:#059669;">응력–변형률 선도</div>
+      <p style="font-size:0.95em;">(Stress–Strain)</p>
+      <ul style="list-style:none; padding:0; font-size:0.95em;">
+        <li>▸ 시편의 치수에 <strong>무관</strong></li>
+        <li>▸ <strong>재료 자체의 고유한 특성</strong></li>
+        <li>▸ 축: σ (응력) vs ε (변형률)</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ===== 공칭 vs 진 ===== -->
+  <h3>3.3 공칭값 vs 진값</h3>
+
+  <table>
+    <thead>
+      <tr><th>구분</th><th>공칭 (Engineering)</th><th>진 (True)</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>응력</strong></td>
+        <td>$\sigma_{\text{eng}} = \dfrac{F}{A_0}$<br><span style="font-size:0.85em; color:#555;">(초기 단면적 사용)</span></td>
+        <td>$\sigma_{\text{true}} = \dfrac{F}{A}$<br><span style="font-size:0.85em; color:#555;">(현재 단면적 사용)</span></td>
+      </tr>
+      <tr>
+        <td><strong>변형률</strong></td>
+        <td>$\varepsilon_{\text{eng}} = \dfrac{\delta}{L_0}$<br><span style="font-size:0.85em; color:#555;">(초기 길이 사용)</span></td>
+        <td>$\varepsilon_{\text{true}} = \ln\!\left(\dfrac{L}{L_0}\right)$<br><span style="font-size:0.85em; color:#555;">(적분에 의한 자연로그)</span></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="callout">
+    <strong>참고:</strong> 일반적으로 <strong>공칭응력–공칭변형률 선도</strong>를 사용한다. 진응력–진변형률은 대변형 해석이나 금속 성형 분야에서 주로 사용된다.
+  </div>
+
+  <!-- 공칭 vs 진 곡선 비교 -->
+  <div class="diagram-container">
+    <svg viewBox="0 0 700 420" xmlns="http://www.w3.org/2000/svg" style="max-width:620px;">
+      <!-- Axes -->
+      <line x1="80" y1="360" x2="650" y2="360" stroke="#333" stroke-width="2"/>
+      <line x1="80" y1="360" x2="80" y2="30" stroke="#333" stroke-width="2"/>
+      <polygon points="650,360 640,355 640,365" fill="#333"/>
+      <polygon points="80,30 75,40 85,40" fill="#333"/>
+      <text x="650" y="385" text-anchor="end" fill="#333" font-size="14" font-weight="600">ε (변형률)</text>
+      <text x="55" y="40" text-anchor="middle" fill="#333" font-size="14" font-weight="600">σ</text>
+
+      <!-- Engineering curve -->
+      <path d="M 80,360 L 120,240 Q 140,210 170,200 Q 220,185 300,170 Q 400,155 440,145 Q 480,160 520,200 Q 550,250 560,280"
+            fill="none" stroke="#2563eb" stroke-width="3"/>
+      <circle cx="560" cy="280" r="5" fill="#2563eb"/>
+      <text x="565" y="275" fill="#2563eb" font-size="12" font-weight="600">파단(Eng)</text>
+
+      <!-- True curve -->
+      <path d="M 80,360 L 120,240 Q 140,210 170,200 Q 220,185 300,165 Q 400,135 440,110 Q 480,90 520,70 Q 540,58 555,50"
+            fill="none" stroke="#dc2626" stroke-width="3" stroke-dasharray="8,4"/>
+      <circle cx="555" cy="50" r="5" fill="#dc2626"/>
+      <text x="560" y="48" fill="#dc2626" font-size="12" font-weight="600">파단(True)</text>
+
+      <!-- UTS marker on engineering -->
+      <line x1="440" y1="145" x2="440" y2="365" stroke="#9ca3af" stroke-width="1" stroke-dasharray="4,3"/>
+      <text x="445" y="395" fill="#555" font-size="11">UTS</text>
+
+      <!-- Necking annotation — points to UTS peak at (440,145) -->
+      <line x1="500" y1="120" x2="446" y2="144" stroke="#f59e0b" stroke-width="1.5"/>
+      <circle cx="444" cy="145" r="3" fill="#f59e0b"/>
+      <text x="505" y="115" fill="#f59e0b" font-size="11" font-weight="600">넥킹(Necking)</text>
+      <text x="505" y="130" fill="#f59e0b" font-size="10">국부수축 시작</text>
+
+      <!-- Divergence annotation — points between curves around x=300 -->
+      <line x1="340" y1="120" x2="302" y2="165" stroke="#555" stroke-width="1"/>
+      <circle cx="300" cy="167" r="3" fill="#555"/>
+      <text x="345" y="112" fill="#555" font-size="11">곡선이 갈라지기 시작</text>
+      <text x="345" y="127" fill="#555" font-size="10">(A₀ ≠ A 차이 커짐)</text>
+
+      <!-- Legend -->
+      <line x1="100" y1="20" x2="140" y2="20" stroke="#2563eb" stroke-width="3"/>
+      <text x="148" y="25" fill="#2563eb" font-size="12" font-weight="600">공칭 (Engineering)</text>
+      <line x1="310" y1="20" x2="350" y2="20" stroke="#dc2626" stroke-width="3" stroke-dasharray="8,4"/>
+      <text x="358" y="25" fill="#dc2626" font-size="12" font-weight="600">진 (True)</text>
+    </svg>
+    <div class="diagram-caption">그림 3-2. 공칭 응력–변형률 선도 vs 진 응력–변형률 선도</div>
+  </div>
+
+  <!-- ===== 응력-변형률 선도 주요 특징 ===== -->
+  <h3>3.4 응력–변형률 선도의 주요 특징</h3>
+
+  <!-- MAIN STRESS-STRAIN CURVE -->
+  <div class="chart-wrapper">
+    <svg id="ssChart" viewBox="0 0 800 520" xmlns="http://www.w3.org/2000/svg" style="max-width:750px; display:block; margin:auto;">
+      <!-- Axes -->
+      <line x1="80" y1="440" x2="740" y2="440" stroke="#333" stroke-width="2"/>
+      <line x1="80" y1="440" x2="80" y2="30" stroke="#333" stroke-width="2"/>
+      <polygon points="740,440 730,435 730,445" fill="#333"/>
+      <polygon points="80,30 75,40 85,40" fill="#333"/>
+      <text x="740" y="465" text-anchor="end" fill="#333" font-size="15" font-weight="700">ε (변형률)</text>
+      <text x="45" y="45" text-anchor="middle" fill="#333" font-size="15" font-weight="700">σ (응력)</text>
+
+      <!-- Grid lines (light) -->
+      <g stroke="#f1f5f9" stroke-width="1">
+        <line x1="80" y1="360" x2="740" y2="360"/>
+        <line x1="80" y1="280" x2="740" y2="280"/>
+        <line x1="80" y1="200" x2="740" y2="200"/>
+        <line x1="80" y1="120" x2="740" y2="120"/>
+        <line x1="200" y1="440" x2="200" y2="30"/>
+        <line x1="350" y1="440" x2="350" y2="30"/>
+        <line x1="500" y1="440" x2="500" y2="30"/>
+        <line x1="650" y1="440" x2="650" y2="30"/>
+      </g>
+
+      <!-- ===== CURVE (연강 Mild Steel style) ===== -->
+      <!-- Elastic region (steep line) -->
+      <path d="M 80,440 L 135,260" fill="none" stroke="#2563eb" stroke-width="3.5"/>
+
+      <!-- Yield point (upper) -->
+      <path d="M 135,260 L 138,248" fill="none" stroke="#2563eb" stroke-width="3.5"/>
+
+      <!-- Yield plateau (lower yield + plateau) -->
+      <path d="M 138,248 L 140,258 Q 155,262 200,260 Q 240,258 260,258" fill="none" stroke="#2563eb" stroke-width="3.5"/>
+
+      <!-- Strain hardening -->
+      <path d="M 260,258 Q 350,240 420,180 Q 470,140 520,115" fill="none" stroke="#2563eb" stroke-width="3.5"/>
+
+      <!-- UTS & necking -->
+      <path d="M 520,115 Q 540,108 560,106 Q 575,106 590,112 Q 620,130 650,180 Q 670,220 680,260" fill="none" stroke="#2563eb" stroke-width="3.5"/>
+
+      <!-- Fracture X -->
+      <circle cx="680" cy="260" r="6" fill="#dc2626"/>
+      <line x1="674" y1="254" x2="686" y2="266" stroke="#fff" stroke-width="2"/>
+      <line x1="674" y1="266" x2="686" y2="254" stroke="#fff" stroke-width="2"/>
+
+      <!-- ===== REGION FILLS ===== -->
+      <!-- Elastic region shading -->
+      <rect x="80" y="248" width="58" height="192" fill="#dbeafe" fill-opacity="0.3"/>
+      <!-- Yield plateau shading -->
+      <rect x="138" y="248" width="122" height="192" fill="#fef08a" fill-opacity="0.3"/>
+      <!-- Strain hardening shading -->
+      <rect x="260" y="106" width="300" height="334" fill="#d1fae5" fill-opacity="0.2"/>
+      <!-- Necking shading -->
+      <rect x="560" y="106" width="130" height="334" fill="#fee2e2" fill-opacity="0.3"/>
+
+      <!-- ===== LABELS ===== -->
+      <!-- Elastic -->
+      <text x="108" y="480" text-anchor="middle" fill="#2563eb" font-size="11" font-weight="700">탄성</text>
+      <text x="108" y="494" text-anchor="middle" fill="#2563eb" font-size="10">영역</text>
+
+      <!-- Yield plateau -->
+      <text x="199" y="480" text-anchor="middle" fill="#b45309" font-size="11" font-weight="700">항복</text>
+      <text x="199" y="494" text-anchor="middle" fill="#b45309" font-size="10">평탄부</text>
+
+      <!-- Strain hardening -->
+      <text x="410" y="480" text-anchor="middle" fill="#059669" font-size="11" font-weight="700">변형률 경화</text>
+      <text x="410" y="494" text-anchor="middle" fill="#059669" font-size="10">(Strain Hardening)</text>
+
+      <!-- Necking -->
+      <text x="625" y="480" text-anchor="middle" fill="#dc2626" font-size="11" font-weight="700">넥킹</text>
+      <text x="625" y="494" text-anchor="middle" fill="#dc2626" font-size="10">(Necking)</text>
+
+      <!-- ===== KEY POINTS ===== -->
+      <!-- Proportional limit -->
+      <circle cx="125" cy="293" r="5" fill="#2563eb"/>
+      <line x1="125" y1="293" x2="125" y2="440" stroke="#2563eb" stroke-width="1" stroke-dasharray="3,3"/>
+      <text x="125" y="281" text-anchor="middle" fill="#2563eb" font-size="10" font-weight="600">비례한도</text>
+
+      <!-- Upper yield point -->
+      <circle cx="138" cy="248" r="5" fill="#f59e0b"/>
+      <line x1="138" y1="248" x2="78" y2="248" stroke="#f59e0b" stroke-width="1" stroke-dasharray="3,3"/>
+      <text x="50" y="245" fill="#f59e0b" font-size="10" font-weight="600">상항복점</text>
+
+      <!-- Lower yield point -->
+      <circle cx="155" cy="262" r="5" fill="#f59e0b"/>
+      <line x1="155" y1="262" x2="78" y2="262" stroke="#f59e0b" stroke-width="1" stroke-dasharray="3,3"/>
+      <text x="50" y="272" fill="#f59e0b" font-size="10" font-weight="600">하항복점</text>
+
+      <!-- σ_y line -->
+      <line x1="78" y1="258" x2="270" y2="258" stroke="#b45309" stroke-width="1.5" stroke-dasharray="6,3"/>
+      <text x="63" y="261" fill="#b45309" font-size="12" font-weight="700">σ<tspan font-size="9" dy="3">y</tspan></text>
+
+      <!-- UTS -->
+      <circle cx="560" cy="106" r="6" fill="#dc2626"/>
+      <line x1="560" y1="106" x2="78" y2="106" stroke="#dc2626" stroke-width="1.5" stroke-dasharray="6,3"/>
+      <text x="62" y="110" fill="#dc2626" font-size="12" font-weight="700">σ<tspan font-size="9" dy="3">u</tspan></text>
+      <text x="560" y="90" text-anchor="middle" fill="#dc2626" font-size="12" font-weight="700">인장강도 (UTS)</text>
+      <text x="560" y="78" text-anchor="middle" fill="#dc2626" font-size="10">(최대 응력)</text>
+
+      <!-- Fracture -->
+      <text x="690" y="252" fill="#dc2626" font-size="12" font-weight="700">파단</text>
+      <text x="690" y="268" fill="#dc2626" font-size="10">(Fracture)</text>
+
+      <!-- Elastic slope label -->
+      <text x="95" y="340" fill="#2563eb" font-size="12" font-weight="600" transform="rotate(-60 95 340)">E (탄성계수)</text>
+
+      <!-- ===== SMALL NOTE: elastic region is tiny ===== -->
+      <rect x="86" y="502" width="180" height="18" rx="4" fill="#dbeafe"/>
+      <text x="176" y="515" text-anchor="middle" fill="#1e40af" font-size="10" font-weight="600">※ 실제 탄성 영역은 전체 대비 매우 작음</text>
+    </svg>
+    <div class="diagram-caption">그림 3-3. 연강(Mild Steel)의 공칭 응력–변형률 선도 — 주요 특징</div>
+  </div>
+
+  <!-- 주요 용어 카드 -->
+  <div class="grid-2">
+    <div class="card card-accent">
+      <h4>탄성 영역 (Elastic Region)</h4>
+      <p>하중을 제거하면 원래 형상으로 <strong>완전히 복원</strong>되는 영역. 응력과 변형률이 선형 비례 관계(Hooke's Law).</p>
+      <div class="equation-box" style="font-size:1em; padding:14px;">$$\sigma = E \cdot \varepsilon$$</div>
+      <p style="font-size:0.9em; margin:0;">E: 탄성계수 (Young's Modulus) = 응력–변형률 선도 기울기</p>
+    </div>
+    <div class="card card-purple">
+      <h4>소성 영역 (Plastic Region)</h4>
+      <p>하중을 제거해도 <strong>영구 변형이 남는</strong> 영역. 항복점을 넘어선 이후.</p>
+      <ul style="font-size:0.95em; margin-left:18px;">
+        <li>항복 평탄부 (Yield Plateau)</li>
+        <li>변형률 경화 (Strain Hardening)</li>
+        <li>넥킹 (Necking) → 파단 (Fracture)</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ===== 항복응력 결정 ===== -->
+  <h4>항복응력 결정 방법</h4>
+
+  <div class="grid-2">
+    <div class="card card-green">
+      <h4 style="color:#059669;">Case 1: 명확한 항복점</h4>
+      <p>응력–변형률 곡선에서 <strong>뚜렷한 항복점</strong>이 나타남 (예: 연강)</p>
+      <p style="font-size:0.9em;">→ 상항복점 / 하항복점이 관찰됨</p>
+    </div>
+    <div class="card card-red">
+      <h4 style="color:#dc2626;">Case 2: 불명확한 항복점</h4>
+      <p>항복점이 명확하지 않은 경우 (예: 알루미늄, 구리)</p>
+      <p style="font-size:0.9em;">→ <strong>0.2% Offset법</strong> 사용</p>
+    </div>
+  </div>
+
+  <!-- 0.2% Offset Method -->
+  <div class="diagram-container">
+    <svg viewBox="0 0 700 460" xmlns="http://www.w3.org/2000/svg" style="max-width:620px;">
+      <text x="350" y="24" text-anchor="middle" font-size="16" font-weight="700" fill="#333">0.2% Offset법에 의한 항복응력 결정</text>
+
+      <!-- Axes -->
+      <line x1="80" y1="400" x2="640" y2="400" stroke="#333" stroke-width="2"/>
+      <line x1="80" y1="400" x2="80" y2="40" stroke="#333" stroke-width="2"/>
+      <polygon points="640,400 630,395 630,405" fill="#333"/>
+      <polygon points="80,40 75,50 85,50" fill="#333"/>
+      <text x="640" y="425" text-anchor="end" fill="#333" font-size="14" font-weight="600">ε</text>
+      <text x="55" y="50" text-anchor="middle" fill="#333" font-size="14" font-weight="600">σ</text>
+
+      <!-- Curve (no clear yield, smooth) -->
+      <path d="M 80,400 L 170,220 Q 200,160 260,130 Q 350,90 470,68 Q 570,56 640,54"
+            fill="none" stroke="#2563eb" stroke-width="3"/>
+
+      <!-- Original elastic slope (from origin, gray dashed) — slope = -2.0 -->
+      <line x1="80" y1="400" x2="220" y2="120" stroke="#9ca3af" stroke-width="1.5" stroke-dasharray="5,3"/>
+
+      <!-- 0.2% offset point on x-axis -->
+      <circle cx="155" cy="400" r="4" fill="#dc2626"/>
+      <text x="155" y="420" text-anchor="middle" fill="#dc2626" font-size="12" font-weight="600">0.002</text>
+      <text x="155" y="435" text-anchor="middle" fill="#dc2626" font-size="10">(0.2%)</text>
+
+      <!-- Offset line (parallel to elastic slope, from 0.2% point) — slope = -2.0 -->
+      <line x1="155" y1="400" x2="325" y2="60" stroke="#dc2626" stroke-width="2.5" stroke-dasharray="8,4"/>
+      <text x="248" y="286" fill="#dc2626" font-size="11" font-weight="600" transform="rotate(-63 248 286)">평행 이동선</text>
+
+      <!-- Intersection point (where offset line meets curve, ~x=298, y=114) -->
+      <circle cx="298" cy="114" r="7" fill="#dc2626" stroke="#fff" stroke-width="2"/>
+
+      <!-- Horizontal dashed to y-axis -->
+      <line x1="298" y1="114" x2="80" y2="114" stroke="#dc2626" stroke-width="1.5" stroke-dasharray="5,3"/>
+
+      <!-- σ_y label -->
+      <text x="52" y="118" fill="#dc2626" font-size="14" font-weight="700">σ<tspan font-size="10" dy="3">y</tspan></text>
+      <rect x="38" y="104" width="40" height="20" rx="4" fill="none" stroke="#dc2626" stroke-width="1.5"/>
+
+      <!-- Vertical dashed down from intersection -->
+      <line x1="298" y1="114" x2="298" y2="400" stroke="#9ca3af" stroke-width="1" stroke-dasharray="3,3"/>
+
+      <!-- Annotation arrow to intersection -->
+      <path d="M 352,100 L 310,112" fill="none" stroke="#059669" stroke-width="1.5" marker-end="url(#aGreen)"/>
+      <text x="360" y="90" fill="#059669" font-size="12" font-weight="700">Offset Yield Stress</text>
+      <text x="360" y="106" fill="#059669" font-size="11">(0.2% 오프셋 항복응력)</text>
+
+      <!-- Method explanation -->
+      <rect x="400" y="170" width="260" height="130" rx="10" fill="#fff7ed" stroke="#f59e0b" stroke-width="1.5"/>
+      <text x="530" y="195" text-anchor="middle" font-size="12" font-weight="700" fill="#92400e">방법</text>
+      <text x="415" y="218" fill="#555" font-size="11">1. ε = 0.002 (0.2%) 지점 표시</text>
+      <text x="415" y="238" fill="#555" font-size="11">2. 탄성 기울기(E)와 평행한</text>
+      <text x="425" y="255" fill="#555" font-size="11">직선을 그음</text>
+      <text x="415" y="278" fill="#555" font-size="11">3. 곡선과 만나는 점의</text>
+      <text x="425" y="295" fill="#555" font-size="11">응력 = 항복응력(σ<tspan font-size="8" dy="2">y</tspan><tspan dy="-2">)</tspan></text>
+
+      <!-- Elastic slope label -->
+      <text x="132" y="300" fill="#9ca3af" font-size="11" transform="rotate(-63 132 300)">탄성 기울기 E</text>
+    </svg>
+    <div class="diagram-caption">그림 3-4. 0.2% Offset법 — 명확한 항복점이 없는 재료의 항복응력 결정</div>
+  </div>
+
+  <!-- ===== 연성 vs 취성 ===== -->
+  <h3>3.5 연성재료 vs 취성재료</h3>
+
+  <table>
+    <thead>
+      <tr><th>구분</th><th>연성재료 (Ductile)</th><th>취성재료 (Brittle)</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>특징</strong></td>
+        <td>파단 전 <strong>충분한 소성변형</strong> 발생</td>
+        <td>파단 전 소성변형이 <strong>거의 없음</strong></td>
+      </tr>
+      <tr>
+        <td><strong>예시</strong></td>
+        <td><span class="badge badge-blue">알루미늄</span> <span class="badge badge-blue">구리</span> <span class="badge badge-blue">연강</span></td>
+        <td><span class="badge badge-red">콘크리트</span> <span class="badge badge-red">유리</span> <span class="badge badge-red">세라믹</span></td>
+      </tr>
+      <tr>
+        <td><strong>파단 양상</strong></td>
+        <td>서서히 늘어나며 경고 신호 있음</td>
+        <td>갑작스러운 파단 (경고 없음!)</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- 연성 vs 취성 비교 곡선 -->
+  <div class="diagram-container">
+    <svg viewBox="0 0 800 460" xmlns="http://www.w3.org/2000/svg" style="max-width:700px;">
+      <text x="400" y="24" text-anchor="middle" font-size="16" font-weight="700" fill="#333">연성재료 vs 취성재료 — 응력–변형률 선도 비교</text>
+
+      <!-- Axes -->
+      <line x1="80" y1="390" x2="720" y2="390" stroke="#333" stroke-width="2"/>
+      <line x1="80" y1="390" x2="80" y2="40" stroke="#333" stroke-width="2"/>
+      <polygon points="720,390 710,385 710,395" fill="#333"/>
+      <polygon points="80,40 75,50 85,50" fill="#333"/>
+      <text x="720" y="415" text-anchor="end" fill="#333" font-size="14" font-weight="600">ε (변형률)</text>
+      <text x="50" y="50" text-anchor="middle" fill="#333" font-size="14" font-weight="600">σ (응력)</text>
+
+      <!-- ===== DUCTILE CURVE (blue) ===== -->
+      <path d="M 80,390 L 120,280 Q 135,255 150,250 Q 180,245 220,245 Q 300,230 400,170 Q 470,130 530,110 Q 560,108 580,115 Q 620,140 650,200"
+            fill="none" stroke="#2563eb" stroke-width="3"/>
+      <!-- Fracture X ductile -->
+      <circle cx="650" cy="200" r="6" fill="#2563eb"/>
+      <line x1="644" y1="194" x2="656" y2="206" stroke="#fff" stroke-width="2"/>
+      <line x1="644" y1="206" x2="656" y2="194" stroke="#fff" stroke-width="2"/>
+
+      <!-- Ductile area shading -->
+      <path d="M 80,390 L 120,280 Q 135,255 150,250 Q 180,245 220,245 Q 300,230 400,170 Q 470,130 530,110 Q 560,108 580,115 Q 620,140 650,200 L 650,390 Z"
+            fill="#2563eb" fill-opacity="0.06"/>
+
+      <!-- ===== BRITTLE CURVE (red) ===== -->
+      <path d="M 80,390 L 130,200 Q 150,140 175,100 Q 190,80 200,75"
+            fill="none" stroke="#dc2626" stroke-width="3"/>
+      <!-- Fracture X brittle -->
+      <circle cx="200" cy="75" r="6" fill="#dc2626"/>
+      <line x1="194" y1="69" x2="206" y2="81" stroke="#fff" stroke-width="2"/>
+      <line x1="194" y1="81" x2="206" y2="69" stroke="#fff" stroke-width="2"/>
+
+      <!-- ===== LABELS ===== -->
+      <text x="550" y="90" fill="#2563eb" font-size="15" font-weight="700">연성재료</text>
+      <text x="550" y="108" fill="#2563eb" font-size="12">(Ductile)</text>
+
+      <text x="220" y="68" fill="#dc2626" font-size="15" font-weight="700">취성재료</text>
+      <text x="220" y="86" fill="#dc2626" font-size="12">(Brittle)</text>
+
+      <!-- Ductile strain range -->
+      <line x1="80" y1="405" x2="80" y2="415" stroke="#2563eb" stroke-width="1"/>
+      <line x1="650" y1="405" x2="650" y2="415" stroke="#2563eb" stroke-width="1"/>
+      <line x1="80" y1="410" x2="650" y2="410" stroke="#2563eb" stroke-width="1.5"/>
+      <text x="365" y="430" text-anchor="middle" fill="#2563eb" font-size="11" font-weight="600">큰 변형률 범위 (충분한 소성변형)</text>
+
+      <!-- Brittle strain range -->
+      <line x1="80" y1="420" x2="80" y2="430" stroke="#dc2626" stroke-width="1"/>
+      <line x1="200" y1="420" x2="200" y2="430" stroke="#dc2626" stroke-width="1"/>
+      <line x1="80" y1="425" x2="200" y2="425" stroke="#dc2626" stroke-width="1.5"/>
+      <text x="140" y="444" text-anchor="middle" fill="#dc2626" font-size="11" font-weight="600">작은 변형률</text>
+
+      <!-- Annotations -->
+      <!-- Brittle: high strength, low strain -->
+      <rect x="260" y="130" width="210" height="80" rx="8" fill="#fff" stroke="#e2e8f0" stroke-width="1"/>
+      <text x="365" y="152" text-anchor="middle" fill="#dc2626" font-size="12" font-weight="700">취성재료 특징</text>
+      <text x="275" y="172" fill="#555" font-size="11">• 높은 강도, 작은 변형률</text>
+      <text x="275" y="192" fill="#555" font-size="11">• 갑작스런 파단 (경고 없음)</text>
+
+      <!-- Ductile annotation -->
+      <rect x="460" y="230" width="210" height="100" rx="8" fill="#fff" stroke="#e2e8f0" stroke-width="1"/>
+      <text x="565" y="252" text-anchor="middle" fill="#2563eb" font-size="12" font-weight="700">연성재료 특징</text>
+      <text x="475" y="272" fill="#555" font-size="11">• 큰 소성변형 후 파단</text>
+      <text x="475" y="292" fill="#555" font-size="11">• 넥킹(necking) 발생</text>
+      <text x="475" y="312" fill="#555" font-size="11">• 파단 전 경고 있음 (안전)</text>
+
+      <!-- Elastic slope comparison -->
+      <text x="100" y="350" fill="#555" font-size="10" transform="rotate(-65 100 350)">E (탄성계수)</text>
+    </svg>
+    <div class="diagram-caption">그림 3-5. 연성재료와 취성재료의 응력–변형률 선도 비교</div>
+  </div>
+
+  <!-- 파단면 비교 -->
+  <div class="grid-2">
+    <div class="card card-accent">
+      <h4 style="color:#2563eb;">연성 파단면 — Cup & Cone</h4>
+      <div style="text-align:center; margin:16px 0;">
+        <svg viewBox="0 0 200 160" width="180" height="140">
+          <!-- Top piece (moved up to create separation) -->
+          <path d="M 40,5 L 40,45 Q 40,60 60,65 Q 80,70 100,75 Q 120,70 140,65 Q 160,60 160,45 L 160,5 Z"
+                fill="#93c5fd" stroke="#2563eb" stroke-width="2"/>
+          <!-- Bottom piece (moved down to create separation) -->
+          <path d="M 40,155 L 40,115 Q 40,100 60,95 Q 80,90 100,85 Q 120,90 140,95 Q 160,100 160,115 L 160,155 Z"
+                fill="#93c5fd" stroke="#2563eb" stroke-width="2"/>
+        </svg>
+      </div>
+      <p style="font-size:0.9em; text-align:center;">Cup and Cone 형태의 파단면<br>넥킹(국부수축) 후 파단</p>
+    </div>
+    <div class="card card-red">
+      <h4 style="color:#dc2626;">취성 파단면 — Flat</h4>
+      <div style="text-align:center; margin:16px 0;">
+        <svg viewBox="0 0 200 160" width="180" height="140">
+          <!-- Top piece -->
+          <rect x="40" y="10" width="120" height="65" rx="2" fill="#fca5a5" stroke="#dc2626" stroke-width="2"/>
+          <!-- Bottom piece -->
+          <rect x="40" y="85" width="120" height="65" rx="2" fill="#fca5a5" stroke="#dc2626" stroke-width="2"/>
+        </svg>
+      </div>
+      <p style="font-size:0.9em; text-align:center;">평탄한(Flat) 파단면<br>소성변형 없이 갑자기 파단</p>
+    </div>
+  </div>
+
+</section>
+
+<!-- ============================================================ -->
+<!--                   SUMMARY                                     -->
+<!-- ============================================================ -->
+<section style="background: linear-gradient(135deg, #eff6ff, #f0f0ff, #ecfdf5); border-radius: var(--radius); padding:40px; margin:40px 0;">
+  <h2 style="justify-content:center;"><span class="num">Σ</span> 전체 요약</h2>
+
+  <div class="diagram-container" style="background:#fff;">
+    <svg viewBox="0 0 800 380" xmlns="http://www.w3.org/2000/svg" style="max-width:720px;">
+      <!-- Central concept -->
+      <rect x="300" y="10" width="200" height="50" rx="25" fill="#2563eb" stroke="none"/>
+      <text x="400" y="42" text-anchor="middle" fill="#fff" font-size="16" font-weight="700">재료역학 핵심</text>
+
+      <!-- Branches -->
+      <!-- Left: Stress -->
+      <line x1="300" y1="35" x2="150" y2="100" stroke="#2563eb" stroke-width="2"/>
+      <rect x="40" y="80" width="220" height="44" rx="22" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
+      <text x="150" y="108" text-anchor="middle" fill="#1e40af" font-size="14" font-weight="700">응력 (Stress)</text>
+
+      <!-- Right: Strain -->
+      <line x1="500" y1="35" x2="650" y2="100" stroke="#7c3aed" stroke-width="2"/>
+      <rect x="540" y="80" width="220" height="44" rx="22" fill="#ede9fe" stroke="#7c3aed" stroke-width="2"/>
+      <text x="650" y="108" text-anchor="middle" fill="#5b21b6" font-size="14" font-weight="700">변형률 (Strain)</text>
+
+      <!-- Stress children -->
+      <line x1="100" y1="124" x2="80" y2="165" stroke="#2563eb" stroke-width="1.5"/>
+      <line x1="200" y1="124" x2="220" y2="165" stroke="#2563eb" stroke-width="1.5"/>
+
+      <rect x="15" y="165" width="130" height="36" rx="8" fill="#fff" stroke="#2563eb" stroke-width="1.5"/>
+      <text x="80" y="188" text-anchor="middle" fill="#2563eb" font-size="12" font-weight="600">수직응력 σ</text>
+
+      <rect x="160" y="165" width="130" height="36" rx="8" fill="#fff" stroke="#7c3aed" stroke-width="1.5"/>
+      <text x="225" y="188" text-anchor="middle" fill="#7c3aed" font-size="12" font-weight="600">전단응력 τ</text>
+
+      <!-- Strain children -->
+      <line x1="600" y1="124" x2="580" y2="165" stroke="#7c3aed" stroke-width="1.5"/>
+      <line x1="700" y1="124" x2="720" y2="165" stroke="#7c3aed" stroke-width="1.5"/>
+
+      <rect x="515" y="165" width="130" height="36" rx="8" fill="#fff" stroke="#2563eb" stroke-width="1.5"/>
+      <text x="580" y="188" text-anchor="middle" fill="#2563eb" font-size="12" font-weight="600">수직변형률 ε</text>
+
+      <rect x="660" y="165" width="130" height="36" rx="8" fill="#fff" stroke="#7c3aed" stroke-width="1.5"/>
+      <text x="725" y="188" text-anchor="middle" fill="#7c3aed" font-size="12" font-weight="600">전단변형률 γ</text>
+
+      <!-- Middle: constitutive relationship -->
+      <line x1="400" y1="60" x2="400" y2="245" stroke="#059669" stroke-width="2"/>
+      <rect x="270" y="245" width="260" height="50" rx="25" fill="#059669" stroke="none"/>
+      <text x="400" y="276" text-anchor="middle" fill="#fff" font-size="14" font-weight="700">구성 관계 (σ–ε 선도)</text>
+
+      <!-- Bottom items -->
+      <line x1="320" y1="295" x2="200" y2="335" stroke="#059669" stroke-width="1.5"/>
+      <line x1="400" y1="295" x2="400" y2="335" stroke="#059669" stroke-width="1.5"/>
+      <line x1="480" y1="295" x2="600" y2="335" stroke="#059669" stroke-width="1.5"/>
+
+      <rect x="100" y="335" width="200" height="32" rx="8" fill="#d1fae5" stroke="#059669" stroke-width="1.5"/>
+      <text x="200" y="356" text-anchor="middle" fill="#065f46" font-size="12" font-weight="600">탄성계수 E, 항복응력 σ<tspan font-size="9" dy="3">y</tspan></text>
+
+      <rect x="310" y="335" width="180" height="32" rx="8" fill="#d1fae5" stroke="#059669" stroke-width="1.5"/>
+      <text x="400" y="356" text-anchor="middle" fill="#065f46" font-size="12" font-weight="600">인장강도 σ<tspan font-size="9" dy="3">u</tspan><tspan dy="-3"> (UTS)</tspan></text>
+
+      <rect x="510" y="335" width="200" height="32" rx="8" fill="#d1fae5" stroke="#059669" stroke-width="1.5"/>
+      <text x="610" y="356" text-anchor="middle" fill="#065f46" font-size="12" font-weight="600">연성 / 취성 분류</text>
+
+      <!-- Connecting σ=Eε -->
+      <text x="400" y="235" text-anchor="middle" fill="#059669" font-size="13" font-weight="700">σ = Eε (Hooke's Law)</text>
+    </svg>
+    <div class="diagram-caption">전체 개념 맵 — 응력, 변형률, 구성 관계</div>
+  </div>
+
+  <!-- Final summary list -->
+  <div class="grid-2">
+    <div>
+      <ol class="steps">
+        <li><strong>응력(σ, τ)</strong>은 단위 면적당 내력으로, 물체 내부 상태를 나타냄</li>
+        <li><strong>변형률(ε, γ)</strong>은 단위길이당 변형량으로, 치수에 무관한 변형 지표</li>
+        <li><strong>응력–변형률 선도</strong>는 재료 고유의 기계적 특성을 나타냄</li>
+      </ol>
+    </div>
+    <div>
+      <ol class="steps" style="counter-reset: step 3;">
+        <li>탄성 영역에서 <strong>σ = Eε</strong> (Hooke's Law)</li>
+        <li><strong>항복응력</strong>: 명확한 항복점 또는 0.2% Offset법으로 결정</li>
+        <li>연성재료는 충분한 소성변형, 취성재료는 갑작스런 파단</li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!--                    QUIZ SECTION                              -->
+<!-- ============================================================ -->
+<section id="sec-quiz" class="quiz-section">
+
+<div class="quiz-header">
+  <h2>재료역학 퀴즈</h2>
+  <p>응력 · 변형률 · 응력–변형률 선도 · 종합 점검</p>
+</div>
+
+<div class="score-bar">
+  <div class="score-item"><span class="dot correct"></span> 정답: <span id="correctCount">0</span></div>
+  <div class="score-item"><span class="dot wrong"></span> 오답: <span id="wrongCount">0</span></div>
+  <div class="score-item"><span class="dot remaining"></span> 남은 문제: <span id="remainCount">15</span></div>
+  <div class="score-item">
+    <div class="progress-bar-bg"><div class="progress-bar-fill" id="progressBar" style="width:0%"></div></div>
+  </div>
+</div>
+
+<div class="quiz-container">
+
+  <!-- ====== Part A ====== -->
+  <div class="part-title"><div class="part-icon">A</div> 응력 (Stress)</div>
+
+  <!-- Q1 -->
+  <div class="quiz-card" id="card1">
+    <div class="q-header"><span class="q-number">1</span><span class="q-title">응력의 정의</span></div>
+    <p class="q-text">다음 중 응력(Stress)의 정의로 가장 올바른 것은?</p>
+    <div class="options" id="options1">
+      <label class="option-label" data-value="a">
+        <input type="radio" name="q1" value="a"><span class="option-radio"></span>
+        (a) 물체에 작용하는 외력의 크기
+      </label>
+      <label class="option-label" data-value="b">
+        <input type="radio" name="q1" value="b"><span class="option-radio"></span>
+        (b) 물체 내부에 작용하는 단위 면적당 내력
+      </label>
+      <label class="option-label" data-value="c">
+        <input type="radio" name="q1" value="c"><span class="option-radio"></span>
+        (c) 물체의 단위 길이당 변형량
+      </label>
+      <label class="option-label" data-value="d">
+        <input type="radio" name="q1" value="d"><span class="option-radio"></span>
+        (d) 물체가 버틸 수 있는 최대 하중
+      </label>
+    </div>
+    <div class="btn-group" style="margin-top:16px">
+      <button class="qbtn qbtn-primary" onclick="checkMC(1,'b')" id="submit1">정답 확인</button>
+    </div>
+    <div class="result-badge" id="result1"></div>
+    <div class="explanation" id="exp1">
+      <span class="answer-tag">정답: (b)</span>
+      <p>응력은 외력 자체가 아니라, 외력과 평형을 이루기 위해 물체 <strong>내부</strong>에 발생하는 <strong>단위 면적당</strong> 내력이다. (a)는 하중, (c)는 변형률, (d)는 강도에 가까운 설명이다.</p>
+    </div>
+  </div>
+
+  <!-- Q2 -->
+  <div class="quiz-card" id="card2">
+    <div class="q-header"><span class="q-number">2</span><span class="q-title">응력을 쓰는 이유</span></div>
+    <p class="q-text">단면적이 100 mm²인 봉과 10,000 mm²인 봉에 동일하게 1,000 N의 인장력이 작용한다. 두 봉의 내부 상태는 같다고 할 수 있는가?</p>
+    <div class="options" id="options2">
+      <label class="option-label" data-value="same">
+        <input type="radio" name="q2" value="same"><span class="option-radio"></span>
+        같다
+      </label>
+      <label class="option-label" data-value="diff">
+        <input type="radio" name="q2" value="diff"><span class="option-radio"></span>
+        같지 않다
+      </label>
+    </div>
+    <div class="btn-group" style="margin-top:16px">
+      <button class="qbtn qbtn-primary" onclick="checkMC(2,'diff')" id="submit2">정답 확인</button>
+    </div>
+    <div class="result-badge" id="result2"></div>
+    <div class="explanation" id="exp2">
+      <span class="answer-tag">정답: 같지 않다</span>
+      <p>• 단면적 100 mm² → σ = 1,000 / 100 = <strong>10 MPa</strong><br>
+         • 단면적 10,000 mm² → σ = 1,000 / 10,000 = <strong>0.1 MPa</strong><br><br>
+         같은 힘이라도 면적이 다르면 응력이 다르다. 이것이 힘만으로는 부족하고 <strong>응력</strong>을 정의해야 하는 이유이다.</p>
+    </div>
+  </div>
+
+  <!-- Q3 -->
+  <div class="quiz-card" id="card3">
+    <div class="q-header"><span class="q-number">3</span><span class="q-title">수직응력 vs 전단응력</span></div>
+    <p class="q-text">다음 설명 중 <strong>틀린</strong> 것을 <strong>모두</strong> 고르시오.</p>
+    <div class="options" id="options3">
+      <label class="option-label" data-value="a">
+        <input type="checkbox" name="q3" value="a"><span class="option-check"></span>
+        (a) 수직응력은 단면의 법선 방향으로 작용한다
+      </label>
+      <label class="option-label" data-value="b">
+        <input type="checkbox" name="q3" value="b"><span class="option-check"></span>
+        (b) 전단응력은 단면의 접선 방향으로 작용한다
+      </label>
+      <label class="option-label" data-value="c">
+        <input type="checkbox" name="q3" value="c"><span class="option-check"></span>
+        (c) 수직응력은 길이 변화를, 전단응력은 각도 변화를 유발한다
+      </label>
+      <label class="option-label" data-value="d">
+        <input type="checkbox" name="q3" value="d"><span class="option-check"></span>
+        (d) 전단응력의 단위는 라디안(rad)이다
+      </label>
+    </div>
+    <div class="btn-group" style="margin-top:16px">
+      <button class="qbtn qbtn-primary" onclick="checkMulti(3,['c','d'])" id="submit3">정답 확인</button>
+    </div>
+    <div class="result-badge" id="result3"></div>
+    <div class="explanation" id="exp3">
+      <span class="answer-tag">정답: (c), (d)</span>
+      <p><strong>(d)</strong> 전단응력의 단위는 수직응력과 동일하게 <strong>Pa (N/m²)</strong>이다. 라디안은 <strong>전단변형률</strong>의 단위이다. 응력과 변형률의 단위를 혼동하지 않도록 주의해야 한다.<br><br>
+      <strong>(c)</strong> 비등방성(이방성) 재료에서는 수직응력이 각도 변화를 유발할 수도 있으므로, 수직응력은 길이 변화만, 전단응력은 각도 변화만 유발한다는 서술은 항상 성립하지 않는다.</p>
+    </div>
+  </div>
+
+  <!-- Q4 -->
+  <div class="quiz-card" id="card4">
+    <div class="q-header"><span class="q-number">4</span><span class="q-title">단위 환산</span></div>
+    <p class="q-text">응력 50 MPa를 N/mm² 단위로 바꾸면?</p>
+    <div class="text-input-group">
+      <input type="text" class="text-input" id="input4" placeholder="숫자와 단위를 입력하세요 (예: 50 N/mm²)">
+    </div>
+    <div class="btn-group" style="margin-top:12px">
+      <button class="qbtn qbtn-primary" onclick="checkText(4, '50')" id="submit4">정답 확인</button>
+    </div>
+    <div class="result-badge" id="result4"></div>
+    <div class="explanation" id="exp4">
+      <span class="answer-tag">정답: 50 N/mm²</span>
+      <p>1 MPa = 10⁶ N/m² = <strong>1 N/mm²</strong> 이므로 숫자가 그대로 유지된다. 이 관계는 재료역학에서 매우 자주 사용되므로 반드시 기억해야 한다.</p>
+    </div>
+  </div>
+
+  <!-- ====== Part B ====== -->
+  <div class="part-title"><div class="part-icon">B</div> 변형률 (Strain)</div>
+
+  <!-- Q5 -->
+  <div class="quiz-card" id="card5">
+    <div class="q-header"><span class="q-number">5</span><span class="q-title">변형률을 쓰는 이유</span></div>
+    <p class="q-text">길이 1 m인 봉이 0.5 mm 늘어났고, 길이 100 m인 봉도 0.5 mm 늘어났다. 두 봉의 변형 상태는 같은가?</p>
+    <div class="options" id="options5">
+      <label class="option-label" data-value="same">
+        <input type="radio" name="q5" value="same"><span class="option-radio"></span>
+        같다
+      </label>
+      <label class="option-label" data-value="diff">
+        <input type="radio" name="q5" value="diff"><span class="option-radio"></span>
+        같지 않다
+      </label>
+    </div>
+    <div class="btn-group" style="margin-top:16px">
+      <button class="qbtn qbtn-primary" onclick="checkMC(5,'diff')" id="submit5">정답 확인</button>
+    </div>
+    <div class="result-badge" id="result5"></div>
+    <div class="explanation" id="exp5">
+      <span class="answer-tag">정답: 같지 않다</span>
+      <p>• 1 m 봉: ε = 0.5 / 1,000 = <strong>5 × 10⁻⁴</strong><br>
+         • 100 m 봉: ε = 0.5 / 100,000 = <strong>5 × 10⁻⁶</strong><br><br>
+         같은 변형량이라도 원래 길이가 다르면 변형률이 다르다. 이것이 변형량만으로는 부족하고 <strong>변형률</strong>을 정의해야 하는 이유이다.</p>
+    </div>
+  </div>
+
+  <!-- Q6 -->
+  <div class="quiz-card" id="card6">
+    <div class="q-header"><span class="q-number">6</span><span class="q-title">수직변형률의 단위</span></div>
+    <p class="q-text">수직변형률의 단위로 옳은 것을 <strong>모두</strong> 고르시오.</p>
+    <div class="options" id="options6">
+      <label class="option-label" data-value="a">
+        <input type="checkbox" name="q6" value="a"><span class="option-check"></span>
+        (a) mm/mm
+      </label>
+      <label class="option-label" data-value="b">
+        <input type="checkbox" name="q6" value="b"><span class="option-check"></span>
+        (b) Pa
+      </label>
+      <label class="option-label" data-value="c">
+        <input type="checkbox" name="q6" value="c"><span class="option-check"></span>
+        (c) 무차원
+      </label>
+      <label class="option-label" data-value="d">
+        <input type="checkbox" name="q6" value="d"><span class="option-check"></span>
+        (d) με (마이크로스트레인)
+      </label>
+    </div>
+    <div class="btn-group" style="margin-top:16px">
+      <button class="qbtn qbtn-primary" onclick="checkMulti(6, ['a','c','d'])" id="submit6">정답 확인</button>
+    </div>
+    <div class="result-badge" id="result6"></div>
+    <div class="explanation" id="exp6">
+      <span class="answer-tag">정답: (a), (c), (d)</span>
+      <p>수직변형률 ε = δ/L 이므로 길이/길이 = <strong>무차원</strong>이다. mm/mm, m/m 등으로 표기할 수 있고, 실무에서는 με (10⁻⁶) 단위를 자주 사용한다. (b) Pa는 응력의 단위이다.</p>
+    </div>
+  </div>
+
+  <!-- Q7 -->
+  <div class="quiz-card" id="card7">
+    <div class="q-header"><span class="q-number">7</span><span class="q-title">전단변형률의 의미</span></div>
+    <p class="q-text">전단변형률 γ = 0.01 rad이란 무엇을 뜻하는가?</p>
+    <div class="text-input-group">
+      <textarea class="text-input" id="input7" rows="3" placeholder="설명을 작성하세요..." style="resize:vertical"></textarea>
+    </div>
+    <div class="btn-group" style="margin-top:12px">
+      <button class="qbtn qbtn-primary" onclick="revealAnswer(7)" id="submit7">정답 보기</button>
+    </div>
+    <div class="result-badge" id="result7"></div>
+    <div class="explanation" id="exp7">
+      <span class="answer-tag">모범 답안</span>
+      <p>원래 직각(90°)이었던 두 변 사이의 각도가 약 <strong>0.01 라디안(≈ 0.57°)</strong> 만큼 변했다는 뜻이다.<br><br>
+      전단변형률은 <strong>길이 변화가 아니라 각도 변화</strong>를 나타낸다. 수직변형률과 혼동하지 않도록 주의해야 한다.</p>
+    </div>
+  </div>
+
+  <!-- Q8 -->
+  <div class="quiz-card" id="card8">
+    <div class="q-header"><span class="q-number">8</span><span class="q-title">착각하기 쉬운 점</span></div>
+    <p class="q-text">다음 중 옳은 것은?</p>
+    <div class="options" id="options8">
+      <label class="option-label" data-value="a">
+        <input type="radio" name="q8" value="a"><span class="option-radio"></span>
+        (a) 수직변형률은 형상(각도) 변화를 나타낸다
+      </label>
+      <label class="option-label" data-value="b">
+        <input type="radio" name="q8" value="b"><span class="option-radio"></span>
+        (b) 전단변형률은 길이 변화를 나타낸다
+      </label>
+      <label class="option-label" data-value="c">
+        <input type="radio" name="q8" value="c"><span class="option-radio"></span>
+        (c) 수직변형률은 길이 변화, 전단변형률은 각도 변화와 관련된다
+      </label>
+      <label class="option-label" data-value="d">
+        <input type="radio" name="q8" value="d"><span class="option-radio"></span>
+        (d) 수직변형률과 전단변형률 모두 길이 변화를 나타낸다
+      </label>
+    </div>
+    <div class="btn-group" style="margin-top:16px">
+      <button class="qbtn qbtn-primary" onclick="checkMC(8,'c')" id="submit8">정답 확인</button>
+    </div>
+    <div class="result-badge" id="result8"></div>
+    <div class="explanation" id="exp8">
+      <span class="answer-tag">정답: (c)</span>
+      <p>
+        <table>
+          <tr><th>구분</th><th>관련 물리량</th></tr>
+          <tr><td>수직변형률 ε</td><td>길이 변화</td></tr>
+          <tr><td>전단변형률 γ</td><td>각도 변화 (형상 변화, 뒤틀림)</td></tr>
+        </table>
+        <br>이 대응 관계를 정확히 구분하는 것이 중요하다.
+      </p>
+    </div>
+  </div>
+
+  <!-- ====== Part C ====== -->
+  <div class="part-title"><div class="part-icon">C</div> 응력–변형률 선도와 재료의 기계적 성질</div>
+
+  <!-- Q9 -->
+  <div class="quiz-card" id="card9">
+    <div class="q-header"><span class="q-number">9</span><span class="q-title">응력–변형률 선도를 쓰는 이유</span></div>
+    <p class="q-text">하중–변형(Load–Elongation) 선도 대신 응력–변형률 선도를 사용하는 이유는?</p>
+    <div class="text-input-group">
+      <textarea class="text-input" id="input9" rows="3" placeholder="설명을 작성하세요..." style="resize:vertical"></textarea>
+    </div>
+    <div class="btn-group" style="margin-top:12px">
+      <button class="qbtn qbtn-primary" onclick="revealAnswer(9)" id="submit9">정답 보기</button>
+    </div>
+    <div class="result-badge" id="result9"></div>
+    <div class="explanation" id="exp9">
+      <span class="answer-tag">모범 답안</span>
+      <p>하중–변형 선도는 <strong>시편의 치수(단면적, 길이)에 의존</strong>하므로, 같은 재료라도 시편 크기가 다르면 다른 그래프가 나온다.<br><br>
+      응력–변형률 선도는 단위 면적당 힘(응력)과 단위 길이당 변형(변형률)을 사용하므로 <strong>시편의 치수에 무관</strong>하게 재료 자체의 고유한 특성을 나타낸다.</p>
+    </div>
+  </div>
+
+  <!-- Q10 -->
+  <div class="quiz-card" id="card10">
+    <div class="q-header"><span class="q-number">10</span><span class="q-title">공칭응력 vs 진응력</span></div>
+    <p class="q-text">인장시험 중 시편의 단면적이 줄어들고 있다. 이때 공칭응력과 진응력 중 어느 쪽이 더 큰가?</p>
+    <div class="options" id="options10">
+      <label class="option-label" data-value="eng">
+        <input type="radio" name="q10" value="eng"><span class="option-radio"></span>
+        공칭응력이 더 크다
+      </label>
+      <label class="option-label" data-value="true">
+        <input type="radio" name="q10" value="true"><span class="option-radio"></span>
+        진응력이 더 크다
+      </label>
+      <label class="option-label" data-value="same">
+        <input type="radio" name="q10" value="same"><span class="option-radio"></span>
+        둘 다 같다
+      </label>
+    </div>
+    <div class="btn-group" style="margin-top:16px">
+      <button class="qbtn qbtn-primary" onclick="checkMC(10,'true')" id="submit10">정답 확인</button>
+    </div>
+    <div class="result-badge" id="result10"></div>
+    <div class="explanation" id="exp10">
+      <span class="answer-tag">정답: 진응력이 더 크다</span>
+      <p>• 공칭응력: σ_eng = F / A₀ (초기 단면적으로 나눔)<br>
+         • 진응력: σ_true = F / A (현재 단면적으로 나눔)<br><br>
+         인장 중 단면적이 줄어들므로 A &lt; A₀ → 같은 힘 F에 대해 <strong>σ_true &gt; σ_eng</strong> 이다. 공칭응력–변형률 선도에서 인장강도 이후 응력이 감소하는 것처럼 보이지만, 진응력은 파단까지 계속 증가한다.</p>
+    </div>
+  </div>
+
+  <!-- Q11 -->
+  <div class="quiz-card" id="card11">
+    <div class="q-header"><span class="q-number">11</span><span class="q-title">항복응력 결정법</span></div>
+    <p class="q-text">응력–변형률 선도에서 뚜렷한 항복점이 나타나지 않는 재료의 항복응력은 어떻게 결정하는가?</p>
+    <div class="text-input-group">
+      <textarea class="text-input" id="input11" rows="3" placeholder="방법을 설명하세요..." style="resize:vertical"></textarea>
+    </div>
+    <div class="btn-group" style="margin-top:12px">
+      <button class="qbtn qbtn-primary" onclick="revealAnswer(11)" id="submit11">정답 보기</button>
+    </div>
+    <div class="result-badge" id="result11"></div>
+    <div class="explanation" id="exp11">
+      <span class="answer-tag">모범 답안</span>
+      <p><strong>0.2% Offset법</strong>을 사용한다.<br><br>
+      변형률 축에서 0.002 (0.2%) 지점에서 출발하여 탄성 영역의 기울기와 평행한 직선을 긋고, 이 직선이 응력–변형률 곡선과 만나는 점의 응력을 <strong>Offset 항복응력</strong>으로 정의한다.<br><br>
+      알루미늄 등 명확한 항복점이 없는 많은 금속에서 이 방법을 사용한다.</p>
+    </div>
+  </div>
+
+  <!-- Q12 -->
+  <div class="quiz-card" id="card12">
+    <div class="q-header"><span class="q-number">12</span><span class="q-title">탄성 영역에 대한 착각</span></div>
+    <p class="q-text">다음 중 <strong>틀린</strong> 것은?</p>
+    <div class="options" id="options12">
+      <label class="option-label" data-value="a">
+        <input type="radio" name="q12" value="a"><span class="option-radio"></span>
+        (a) 탄성 영역에서는 하중을 제거하면 원래 형상으로 돌아온다
+      </label>
+      <label class="option-label" data-value="b">
+        <input type="radio" name="q12" value="b"><span class="option-radio"></span>
+        (b) 대부분의 금속에서 탄성 영역은 전체 변형률 범위에 비해 매우 작다
+      </label>
+      <label class="option-label" data-value="c">
+        <input type="radio" name="q12" value="c"><span class="option-radio"></span>
+        (c) 탄성 영역이 넓으므로 대부분의 변형은 탄성변형이다
+      </label>
+      <label class="option-label" data-value="d">
+        <input type="radio" name="q12" value="d"><span class="option-radio"></span>
+        (d) 탄성 영역 내에서 응력과 변형률은 선형(비례) 관계이다
+      </label>
+    </div>
+    <div class="btn-group" style="margin-top:16px">
+      <button class="qbtn qbtn-primary" onclick="checkMC(12,'c')" id="submit12">정답 확인</button>
+    </div>
+    <div class="result-badge" id="result12"></div>
+    <div class="explanation" id="exp12">
+      <span class="answer-tag">정답: (c)</span>
+      <p>실제로 금속의 탄성 영역은 전체 변형률 범위에 비해 <strong>매우 작다.</strong> 응력–변형률 선도를 전체적으로 보면 탄성 영역은 원점 부근의 아주 좁은 구간에 불과하다. 이 점을 착각하기 쉽다.</p>
+    </div>
+  </div>
+
+  <!-- Q13 -->
+  <div class="quiz-card" id="card13">
+    <div class="q-header"><span class="q-number">13</span><span class="q-title">연성재료 vs 취성재료</span></div>
+    <p class="q-text">콘크리트 기둥과 강철 기둥에 동일한 과하중이 작용할 때, 파괴 양상은 어떻게 다른가?</p>
+    <div class="text-input-group">
+      <textarea class="text-input" id="input13" rows="3" placeholder="각각의 파괴 양상을 비교하세요..." style="resize:vertical"></textarea>
+    </div>
+    <div class="btn-group" style="margin-top:12px">
+      <button class="qbtn qbtn-primary" onclick="revealAnswer(13)" id="submit13">정답 보기</button>
+    </div>
+    <div class="result-badge" id="result13"></div>
+    <div class="explanation" id="exp13">
+      <span class="answer-tag">모범 답안</span>
+      <p>• <strong>강철(연성재료)</strong>: 파단 전에 눈에 띄는 소성변형(늘어남, 넥킹 등)이 먼저 발생 → 파괴의 <strong>경고 신호</strong>가 있음<br>
+         • <strong>콘크리트(취성재료)</strong>: 소성변형이 거의 없이 갑자기 파단 → <strong>경고 없이</strong> 파괴<br><br>
+         구조물 설계 시 취성파괴는 사전 경고 없이 발생하므로 더 위험하며, 이 때문에 안전계수를 더 크게 설정하는 경우가 많다.</p>
+    </div>
+  </div>
+
+  <!-- Q14 -->
+  <div class="quiz-card" id="card14">
+    <div class="q-header"><span class="q-number">14</span><span class="q-title">인장시험 시편의 형상</span></div>
+    <p class="q-text">인장시험 시편의 중심부(게이지 구간) 단면적이 양 끝(그립 부분)보다 작은 이유는?</p>
+    <div class="text-input-group">
+      <textarea class="text-input" id="input14" rows="3" placeholder="이유를 설명하세요..." style="resize:vertical"></textarea>
+    </div>
+    <div class="btn-group" style="margin-top:12px">
+      <button class="qbtn qbtn-primary" onclick="revealAnswer(14)" id="submit14">정답 보기</button>
+    </div>
+    <div class="result-badge" id="result14"></div>
+    <div class="explanation" id="exp14">
+      <span class="answer-tag">모범 답안</span>
+      <p>단면적이 작은 중심부에 응력이 집중되어, <strong>파단이 반드시 게이지 구간 내에서 발생하도록 유도</strong>하기 위함이다.<br><br>
+      만약 단면적이 균일하면 그립 부근(응력 집중이 있는 곳)에서 파단이 일어날 수 있어 정확한 재료 특성을 측정하기 어렵다.</p>
+    </div>
+  </div>
+
+  <!-- ====== Part D ====== -->
+  <div class="part-title"><div class="part-icon">D</div> 종합 점검</div>
+
+  <!-- Q15 -->
+  <div class="quiz-card" id="card15">
+    <div class="q-header"><span class="q-number">15</span><span class="q-title">응력과 변형률 대응 관계 (빈칸 채우기)</span></div>
+    <p class="q-text">아래 표의 빈칸을 채우시오.</p>
+    <table class="fill-table">
+      <thead>
+        <tr>
+          <th></th>
+          <th>수직 성분</th>
+          <th>전단 성분</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th>응력</th>
+          <td>σ = F/A, 단위: <input type="text" id="fill1" placeholder="?" data-answer="Pa"></td>
+          <td>τ = V/A, 단위: <input type="text" id="fill2" placeholder="?" data-answer="Pa"></td>
+        </tr>
+        <tr>
+          <th>변형률</th>
+          <td>ε = δ/L, 단위: <input type="text" id="fill3" placeholder="?" data-answer="무차원"></td>
+          <td>γ ≈ φ, 단위: <input type="text" id="fill4" placeholder="?" data-answer="rad"></td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="btn-group">
+      <button class="qbtn qbtn-primary" onclick="checkFill()" id="submit15">정답 확인</button>
+    </div>
+    <div class="result-badge" id="result15"></div>
+    <div class="explanation" id="exp15">
+      <span class="answer-tag">정답</span>
+      <p>
+        <table>
+          <tr><th></th><th>수직 성분</th><th>전단 성분</th></tr>
+          <tr><th>응력</th><td>σ = F/A, 단위: <strong>Pa (N/m²)</strong></td><td>τ = V/A, 단위: <strong>Pa (N/m²)</strong></td></tr>
+          <tr><th>변형률</th><td>ε = δ/L, 단위: <strong>무차원</strong></td><td>γ ≈ φ, 단위: <strong>rad (무차원)</strong></td></tr>
+        </table>
+        <br>핵심: 응력은 수직이든 전단이든 단위가 같고(Pa), 변형률도 수직이든 전단이든 무차원이다. 하지만 <strong>수직 = 길이 변화, 전단 = 각도 변화</strong>라는 물리적 의미는 확실히 다르다.
+      </p>
+    </div>
+  </div>
+
+  <!-- Quiz Footer -->
+  <div class="footer-actions">
+    <div class="final-score" id="finalScore">
+      <div class="big-score" id="bigScore"></div>
+      <p id="scoreMsg"></p>
+    </div>
+    <button class="qbtn qbtn-reset" onclick="resetAll()" style="margin-top:20px">전체 초기화</button>
+  </div>
+
+</div><!-- quiz-container -->
+
+</section>
+
+<!-- ============================================================ -->
+<!--                 ATOMIC PERSPECTIVE SECTION                    -->
+<!-- ============================================================ -->
+<section id="sec-atomic" class="atomic-section">
+
+<div class="atomic-header">
+  <h2>원자 관점의 응력과 변형률</h2>
+  <p>연속체 너머, 원자가 들려주는 역학 이야기</p>
+</div>
+
+<div class="atomic-container">
+
+<!-- SECTION 01 -->
+<div class="asection" id="as1">
+  <div class="section-number">SECTION 01</div>
+  <h3>왜 원자 관점이 필요한가</h3>
+  <p>연속체역학에서는 물질을 균질하고 연속적인 매질로 가정한다. 이 가정 덕분에 응력, 변형률 같은 개념을 깔끔하게 정의할 수 있다. 하지만 실제 물질은 원자들의 집합이다.</p>
+  <p>응력이 왜 생기는지, 탄성은 왜 존재하는지, 소성변형과 파단은 왜 일어나는지 — 이 질문들에 대한 근본적인 답은 원자 스케일에 있다.</p>
+
+  <div class="viz-container">
+    <div class="viz-title">연속체 → 원자 스케일 줌인</div>
+    <svg id="svg-zoom" width="100%" viewBox="0 0 800 260"></svg>
+    <p class="caption">같은 막대를 확대하면 원자들의 격자 배열이 드러난다</p>
+  </div>
+</div>
+
+<!-- SECTION 02 -->
+<div class="asection" id="as2">
+  <div class="section-number">SECTION 02</div>
+  <h3>원자 간 상호작용</h3>
+  <p>두 원자가 가까이 있을 때, 서로 끌어당기는 힘(인력)과 밀어내는 힘(척력)이 동시에 작용한다. 이 둘의 균형이 맞는 거리가 <strong>평형 거리 r₀</strong>이다.</p>
+  <p>에너지-거리 곡선을 보면, 평형 거리에서 에너지가 최소가 된다. 이 "우물"의 깊이와 폭이 재료의 성질을 결정한다.</p>
+
+  <div class="viz-container">
+    <div class="viz-title">에너지-거리 곡선 · 힘-거리 곡선</div>
+    <svg id="svg-potential" width="100%" viewBox="0 0 800 500"></svg>
+    <div class="controls">
+      <div class="toggle-group">
+        <button class="toggle-btn active" onclick="toggleCurve('total')">합계 에너지</button>
+        <button class="toggle-btn" onclick="toggleCurve('attract')">인력</button>
+        <button class="toggle-btn" onclick="toggleCurve('repel')">척력</button>
+        <button class="toggle-btn" onclick="toggleCurve('force')">힘 곡선</button>
+      </div>
+      <label style="margin-left:auto;">원자 간 거리
+        <input type="range" id="distSlider" min="8" max="60" value="26" oninput="updatePotentialMarker()">
+      </label>
+    </div>
+  </div>
+
+  <div class="highlight">
+    평형 거리에서 벗어나면 복원력이 작용한다 — 이것이 거시적으로 <strong>탄성</strong>의 기원이다.
+  </div>
+</div>
+
+<!-- SECTION 03 -->
+<div class="asection" id="as3">
+  <div class="section-number">SECTION 03</div>
+  <h3>응력의 원자적 의미</h3>
+  <p>연속체에서 응력은 σ = F/A로 정의했다. 원자 스케일에서 보면, 가상의 절단면을 가로지르는 <strong>원자 간 결합력의 합</strong>을 그 면적으로 나눈 것이 바로 거시적 응력이다.</p>
+
+  <div class="viz-container">
+    <div class="viz-title">절단면을 가로지르는 원자 간 힘</div>
+    <svg id="svg-stress-atomic" width="100%" viewBox="0 0 800 320"></svg>
+    <p class="caption">왼쪽: 전체 격자와 가상의 절단면 / 오른쪽: 절단면 오른쪽 원자에 작용하는 힘</p>
+  </div>
+</div>
+
+<!-- SECTION 04 -->
+<div class="asection" id="as4">
+  <div class="section-number">SECTION 04</div>
+  <h3>변형률의 원자적 의미</h3>
+  <p>격자가 한 방향으로 균일하게 늘어나면 <strong>수직변형률</strong>, 격자가 기울어지면 <strong>전단변형률</strong>이다. 슬라이더를 움직여 원자 격자의 변형을 직접 확인해 보자.</p>
+
+  <div class="viz-container">
+    <div class="viz-title">격자 변형 시뮬레이션</div>
+    <svg id="svg-strain-atomic" width="100%" viewBox="0 0 800 320"></svg>
+    <div class="controls">
+      <label>수직변형률 ε
+        <input type="range" id="normalStrainA" min="-30" max="50" value="0" oninput="updateStrainAtomic()">
+        <span id="normalValA" style="font-family:'IBM Plex Mono';font-size:0.8rem;width:50px;display:inline-block;color:var(--accent)">0.000</span>
+      </label>
+      <label>전단변형률 γ
+        <input type="range" id="shearStrainA" min="-40" max="40" value="0" oninput="updateStrainAtomic()">
+        <span id="shearValA" style="font-family:'IBM Plex Mono';font-size:0.8rem;width:50px;display:inline-block;color:#d97706">0.000</span>
+      </label>
+      <button class="step-btn reset" onclick="document.getElementById('normalStrainA').value=0;document.getElementById('shearStrainA').value=0;updateStrainAtomic();">초기화</button>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 05 -->
+<div class="asection" id="as5">
+  <div class="section-number">SECTION 05</div>
+  <h3>탄성의 기원</h3>
+  <p>에너지-거리 곡선의 평형점 부근은 포물선에 가깝다. 포물선 = 스프링 = <strong>훅의 법칙</strong>이다.</p>
+  <p>곡선의 곡률(우물의 좁고 깊은 정도)이 클수록 <strong>탄성계수(영률)</strong>가 크다. 아래에서 두 재료의 곡선을 비교해 보자.</p>
+
+  <div class="viz-container">
+    <div class="viz-title">포텐셜 곡선과 포물선 근사 — 두 재료 비교</div>
+    <svg id="svg-elastic" width="100%" viewBox="0 0 800 340"></svg>
+    <div class="controls">
+      <div class="toggle-group">
+        <button class="toggle-btn active" onclick="toggleElastic('stiff')">강한 결합 (높은 E)</button>
+        <button class="toggle-btn active" onclick="toggleElastic('soft')">약한 결합 (낮은 E)</button>
+        <button class="toggle-btn" onclick="toggleElastic('parabola')">포물선 근사 표시</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="highlight">
+    원자 결합이 강할수록(우물이 깊고 좁을수록) 영률이 크다. 다이아몬드 > 강철 > 알루미늄 > 고무 순서의 영률 차이는 결합의 강성 차이에서 비롯된다.
+  </div>
+</div>
+
+<!-- SECTION 06 -->
+<div class="asection" id="as6">
+  <div class="section-number">SECTION 06</div>
+  <h3>연속체와 원자 관점의 대응</h3>
+  <p>지금까지 살펴본 내용을 하나의 표로 정리한다.</p>
+
+  <table class="summary-table">
+    <thead>
+      <tr>
+        <th>거시적 개념</th>
+        <th>연속체 관점</th>
+        <th>원자 관점</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>응력</td><td>단위면적당 내력 (σ = F/A)</td><td>절단면을 가로지르는 원자 간 힘의 합 / 면적</td></tr>
+      <tr><td>변형률</td><td>단위길이당 변형 (ε = δ/L)</td><td>격자 간격의 상대적 변화</td></tr>
+      <tr><td>탄성</td><td>하중 제거 시 원래로 복귀</td><td>평형 위치 부근의 복원력 (포텐셜 곡선의 바닥)</td></tr>
+      <tr><td>영률 (E)</td><td>응력-변형률의 기울기</td><td>에너지-거리 곡선의 곡률 (결합 강성)</td></tr>
+    </tbody>
+  </table>
+
+  <div class="viz-container">
+    <div class="viz-title">스케일 줌인 다이어그램</div>
+    <svg id="svg-scale" width="100%" viewBox="0 0 800 220"></svg>
+  </div>
+</div>
+
+</div><!-- atomic-container -->
+
+</section>
+
+</div><!-- container -->
+
+<footer>
+  재료역학 — 응력, 변형률, 재료의 기계적 성질 &nbsp;|&nbsp; Educational Material
+</footer>
+
+<script>
+  // ============ Quiz Logic ============
+  let correctCount = 0;
+  let wrongCount = 0;
+  let totalGraded = 0;
+  const TOTAL_GRADED_QUESTIONS = 10;
+  const TOTAL_ALL = 15;
+
+  function updateScore() {
+    document.getElementById('correctCount').textContent = correctCount;
+    document.getElementById('wrongCount').textContent = wrongCount;
+    const revealed = document.querySelectorAll('.quiz-section .explanation.show').length;
+    document.getElementById('remainCount').textContent = TOTAL_ALL - revealed;
+    document.getElementById('progressBar').style.width = (revealed / TOTAL_ALL * 100) + '%';
+
+    if (revealed === TOTAL_ALL) {
+      const fs = document.getElementById('finalScore');
+      fs.classList.add('show');
+      if (totalGraded > 0) {
+        document.getElementById('bigScore').textContent = correctCount + ' / ' + totalGraded;
+        const pct = Math.round(correctCount / totalGraded * 100);
+        let msg = '';
+        if (pct === 100) msg = '완벽합니다! 모든 문제를 맞혔습니다.';
+        else if (pct >= 80) msg = '훌륭합니다! 대부분의 개념을 잘 이해하고 있습니다.';
+        else if (pct >= 60) msg = '좋습니다! 몇 가지 개념을 다시 복습해 보세요.';
+        else msg = '기초 개념을 다시 꼼꼼히 복습하는 것을 추천합니다.';
+        document.getElementById('scoreMsg').textContent = msg;
+      }
+    }
+  }
+
+  function showResult(qNum, isCorrect) {
+    const badge = document.getElementById('result' + qNum);
+    badge.classList.add('show');
+    const card = document.getElementById('card' + qNum);
+    if (isCorrect) {
+      badge.classList.add('correct');
+      badge.innerHTML = '&#10004; 정답입니다!';
+      card.classList.add('answered-correct');
+      correctCount++;
+    } else {
+      badge.classList.add('wrong');
+      badge.innerHTML = '&#10008; 오답입니다.';
+      card.classList.add('answered-wrong');
+      wrongCount++;
+    }
+    totalGraded++;
+  }
+
+  function disableOptions(qNum) {
+    const labels = document.querySelectorAll('#options' + qNum + ' .option-label');
+    labels.forEach(function(l) { l.classList.add('disabled'); });
+  }
+
+  function checkMC(qNum, correctAnswer) {
+    const selected = document.querySelector('input[name="q' + qNum + '"]:checked');
+    if (!selected) { alert('선택지를 골라주세요.'); return; }
+
+    const btn = document.getElementById('submit' + qNum);
+    btn.disabled = true;
+
+    const isCorrect = selected.value === correctAnswer;
+    showResult(qNum, isCorrect);
+
+    const labels = document.querySelectorAll('#options' + qNum + ' .option-label');
+    labels.forEach(function(l) {
+      if (l.dataset.value === correctAnswer) l.classList.add('correct-answer');
+      if (l.dataset.value === selected.value && selected.value !== correctAnswer) l.classList.add('wrong-answer');
+    });
+
+    disableOptions(qNum);
+    document.getElementById('exp' + qNum).classList.add('show');
+    updateScore();
+  }
+
+  function checkMulti(qNum, correctAnswers) {
+    const checked = Array.from(document.querySelectorAll('input[name="q' + qNum + '"]:checked')).map(function(i) { return i.value; });
+    if (checked.length === 0) { alert('선택지를 골라주세요.'); return; }
+
+    const btn = document.getElementById('submit' + qNum);
+    btn.disabled = true;
+
+    const isCorrect = checked.length === correctAnswers.length && checked.every(function(v) { return correctAnswers.includes(v); });
+    showResult(qNum, isCorrect);
+
+    const labels = document.querySelectorAll('#options' + qNum + ' .option-label');
+    labels.forEach(function(l) {
+      if (correctAnswers.includes(l.dataset.value)) l.classList.add('correct-answer');
+      if (checked.includes(l.dataset.value) && !correctAnswers.includes(l.dataset.value)) l.classList.add('wrong-answer');
+    });
+
+    disableOptions(qNum);
+    document.getElementById('exp' + qNum).classList.add('show');
+    updateScore();
+  }
+
+  function checkText(qNum, correctAnswer) {
+    const input = document.getElementById('input' + qNum);
+    const val = input.value.trim().replace(/\s/g, '');
+    if (!val) { alert('답을 입력해주세요.'); return; }
+
+    const btn = document.getElementById('submit' + qNum);
+    btn.disabled = true;
+    input.readOnly = true;
+
+    const isCorrect = val.includes(correctAnswer);
+    showResult(qNum, isCorrect);
+
+    input.style.borderColor = isCorrect ? '#27ae60' : '#e74c3c';
+    document.getElementById('exp' + qNum).classList.add('show');
+    updateScore();
+  }
+
+  function revealAnswer(qNum) {
+    const btn = document.getElementById('submit' + qNum);
+    btn.disabled = true;
+    document.getElementById('exp' + qNum).classList.add('show');
+
+    const badge = document.getElementById('result' + qNum);
+    badge.classList.add('show');
+    badge.style.color = '#4a90d9';
+    badge.innerHTML = '&#128214; 모범 답안을 확인하세요.';
+
+    const card = document.getElementById('card' + qNum);
+    card.style.borderColor = '#4a90d9';
+    updateScore();
+  }
+
+  function checkFill() {
+    const btn = document.getElementById('submit15');
+    btn.disabled = true;
+
+    const answers = {
+      fill1: ['pa', 'n/m\u00B2', 'n/m2', 'pa(n/m\u00B2)', 'pa (n/m\u00B2)'],
+      fill2: ['pa', 'n/m\u00B2', 'n/m2', 'pa(n/m\u00B2)', 'pa (n/m\u00B2)'],
+      fill3: ['\uBB34\uCC28\uC6D0'],
+      fill4: ['rad', 'rad(\uBB34\uCC28\uC6D0)', 'rad (\uBB34\uCC28\uC6D0)', '\uB77C\uB514\uC548']
+    };
+
+    let allCorrect = true;
+    for (let id in answers) {
+      const input = document.getElementById(id);
+      const val = input.value.trim().toLowerCase().replace(/\s/g, '');
+      input.readOnly = true;
+      const match = answers[id].some(function(a) { return val === a.toLowerCase().replace(/\s/g, ''); });
+      if (match) {
+        input.style.borderBottomColor = '#27ae60';
+        input.style.color = '#27ae60';
+      } else {
+        input.style.borderBottomColor = '#e74c3c';
+        input.style.color = '#e74c3c';
+        allCorrect = false;
+      }
+    }
+
+    showResult(15, allCorrect);
+    document.getElementById('exp15').classList.add('show');
+    updateScore();
+  }
+
+  function resetAll() {
+    if (!confirm('모든 답변을 초기화하시겠습니까?')) return;
+
+    correctCount = 0;
+    wrongCount = 0;
+    totalGraded = 0;
+
+    document.querySelectorAll('.quiz-section input[type="radio"], .quiz-section input[type="checkbox"]').forEach(function(i) { i.checked = false; });
+    document.querySelectorAll('.quiz-section .text-input').forEach(function(i) { i.value = ''; i.readOnly = false; i.style.borderColor = ''; });
+    for (let i = 1; i <= 4; i++) {
+      const el = document.getElementById('fill' + i);
+      if (el) { el.value = ''; el.readOnly = false; el.style.borderBottomColor = ''; el.style.color = ''; }
+    }
+    document.querySelectorAll('.quiz-section .qbtn-primary').forEach(function(b) { b.disabled = false; });
+    document.querySelectorAll('.quiz-section .option-label').forEach(function(l) {
+      l.classList.remove('disabled', 'correct-answer', 'wrong-answer');
+    });
+    document.querySelectorAll('.quiz-section .result-badge').forEach(function(b) {
+      b.classList.remove('show', 'correct', 'wrong');
+      b.innerHTML = '';
+      b.style.color = '';
+    });
+    document.querySelectorAll('.quiz-section .explanation').forEach(function(e) { e.classList.remove('show'); });
+    document.querySelectorAll('.quiz-section .quiz-card').forEach(function(c) {
+      c.classList.remove('answered-correct', 'answered-wrong');
+      c.style.borderColor = '';
+    });
+    document.getElementById('finalScore').classList.remove('show');
+
+    updateScore();
+    document.getElementById('sec-quiz').scrollIntoView({ behavior: 'smooth' });
+  }
+</script>
+
+<script>
+// ============ Atomic Section Logic ============
+
+// SECTION 01: Zoom-in diagram
+(function(){
+  const svg = document.getElementById('svg-zoom');
+  let html = '';
+  html += '<rect x="40" y="80" width="260" height="100" rx="6" fill="#dbeafe" stroke="#2563eb" stroke-width="1.5"/>';
+  html += '<text x="170" y="140" text-anchor="middle" fill="#2563eb" font-size="14" font-weight="500">연속체</text>';
+  html += '<line x1="330" y1="130" x2="420" y2="130" stroke="#6b7590" stroke-width="1.5" stroke-dasharray="6,4"/>';
+  html += '<polygon points="420,125 435,130 420,135" fill="#6b7590"/>';
+  html += '<text x="380" y="118" text-anchor="middle" fill="#6b7590" font-size="11">확대</text>';
+  const cols=8, rows=5, startX=460, startY=60, sp=32;
+  for(let r=0;r<rows;r++) for(let c=0;c<cols;c++){
+    const x=startX+c*sp, y=startY+r*sp;
+    html += '<circle cx="'+x+'" cy="'+y+'" r="8" fill="#dbeafe" stroke="#2563eb" stroke-width="1"/>';
+    if(c<cols-1) html += '<line x1="'+(x+8)+'" y1="'+y+'" x2="'+(x+sp-8)+'" y2="'+y+'" stroke="#cbd5e1" stroke-width="0.8"/>';
+    if(r<rows-1) html += '<line x1="'+x+'" y1="'+(y+8)+'" x2="'+x+'" y2="'+(y+sp-8)+'" stroke="#cbd5e1" stroke-width="0.8"/>';
+  }
+  html += '<text x="588" y="225" text-anchor="middle" fill="#2563eb" font-size="13" font-weight="500">원자 격자</text>';
+  html += '<text x="572" y="245" text-anchor="middle" fill="#6b7590" font-size="11">\u2190 r\u2080 \u2192</text>';
+  svg.innerHTML = html;
+})();
+
+// SECTION 02: Potential curves
+var potentialState = { total:true, attract:false, repel:false, force:false };
+function lj(r){ var s=2.8/r; return 4*(Math.pow(s,12)-Math.pow(s,6)); }
+function ljForce(r){ var s=2.8/r; return 24/r*(2*Math.pow(s,12)-Math.pow(s,6)); }
+function ljAttract(r){ var s=2.8/r; return -4*Math.pow(s,6); }
+function ljRepel(r){ var s=2.8/r; return 4*Math.pow(s,12); }
+
+function drawPotential(){
+  var svg = document.getElementById('svg-potential');
+  var html = '';
+  var eH=250, fH=200, gap=50, atomAreaH=60;
+  svg.setAttribute('viewBox', '0 0 800 '+(atomAreaH+eH+gap+fH+20));
+  var xMin=2.4, xMax=7.0;
+  var px=function(r){return(r-xMin)/(xMax-xMin)*700+60;};
+  var peY=function(e){return atomAreaH+eH/2-e*60;};
+  var pfY=function(f){return atomAreaH+eH+gap+fH/2-f*50;};
+  var slider=document.getElementById('distSlider');
+  var rVal=xMin+(slider.value/60)*(xMax-xMin);
+  var r0=2.8*Math.pow(2,1/6), eqX=px(r0);
+  var atomY=28, atomR=18;
+  html+='<circle cx="200" cy="'+atomY+'" r="'+atomR+'" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>';
+  html+='<text x="200" y="'+(atomY+5)+'" text-anchor="middle" fill="#2563eb" font-size="10" font-weight="500">A</text>';
+  var rightX=200+(rVal-xMin)*80;
+  html+='<circle cx="'+rightX+'" cy="'+atomY+'" r="'+atomR+'" fill="#dbeafe" stroke="#0d9668" stroke-width="2"/>';
+  html+='<text x="'+rightX+'" y="'+(atomY+5)+'" text-anchor="middle" fill="#0d9668" font-size="10" font-weight="500">B</text>';
+  var aY=atomY+28;
+  html+='<line x1="200" y1="'+aY+'" x2="'+rightX+'" y2="'+aY+'" stroke="#d97706" stroke-width="1.5"/>';
+  html+='<line x1="200" y1="'+(aY-5)+'" x2="200" y2="'+(aY+5)+'" stroke="#d97706" stroke-width="1.5"/>';
+  html+='<line x1="'+rightX+'" y1="'+(aY-5)+'" x2="'+rightX+'" y2="'+(aY+5)+'" stroke="#d97706" stroke-width="1.5"/>';
+  html+='<text x="'+((200+rightX)/2)+'" y="'+(aY-6)+'" text-anchor="middle" fill="#d97706" font-size="11" font-weight="500">r = '+rVal.toFixed(2)+'</text>';
+  html+='<line x1="60" y1="'+(atomAreaH+10)+'" x2="60" y2="'+(atomAreaH+eH)+'" stroke="#cbd5e1"/>';
+  html+='<line x1="60" y1="'+peY(0)+'" x2="760" y2="'+peY(0)+'" stroke="#cbd5e1" stroke-width="0.5" stroke-dasharray="4,4"/>';
+  html+='<text x="30" y="'+(atomAreaH+eH/2)+'" text-anchor="middle" fill="#6b7590" font-size="11" transform="rotate(-90,30,'+(atomAreaH+eH/2)+')">\uC5D0\uB108\uC9C0</text>';
+  var fBase=atomAreaH+eH+gap;
+  html+='<line x1="60" y1="'+fBase+'" x2="60" y2="'+(fBase+fH)+'" stroke="#cbd5e1"/>';
+  html+='<line x1="60" y1="'+pfY(0)+'" x2="760" y2="'+pfY(0)+'" stroke="#cbd5e1" stroke-width="0.5" stroke-dasharray="4,4"/>';
+  html+='<text x="30" y="'+(fBase+fH/2)+'" text-anchor="middle" fill="#6b7590" font-size="11" transform="rotate(-90,30,'+(fBase+fH/2)+')">\uD798</text>';
+  html+='<text x="760" y="'+(fBase+fH+18)+'" text-anchor="end" fill="#6b7590" font-size="11">\uC6D0\uC790 \uAC04 \uAC70\uB9AC r</text>';
+  html+='<text x="760" y="'+(pfY(0)-6)+'" text-anchor="end" fill="#6b7590" font-size="10">\uCC99\uB825 \u2191</text>';
+  html+='<text x="760" y="'+(pfY(0)+14)+'" text-anchor="end" fill="#6b7590" font-size="10">\uC778\uB825 \u2193</text>';
+  function makePath(fn,yMap,color,dash){
+    var d='';
+    for(var i=0;i<=200;i++){var r=xMin+i/200*(xMax-xMin);var y=yMap(fn(r));if(y<atomAreaH||y>fBase+fH+10)continue;d+=(d?'L':'M')+px(r).toFixed(1)+','+y.toFixed(1);}
+    return '<path d="'+d+'" fill="none" stroke="'+color+'" stroke-width="2" '+(dash?'stroke-dasharray="6,4"':'')+'/>';
+  }
+  if(potentialState.attract) html+=makePath(ljAttract,peY,'#0d9668',true);
+  if(potentialState.repel) html+=makePath(ljRepel,peY,'#dc2626',true);
+  if(potentialState.total) html+=makePath(lj,peY,'#2563eb',false);
+  if(potentialState.force) html+=makePath(ljForce,pfY,'#d97706',false);
+  html+='<line x1="'+eqX+'" y1="'+(atomAreaH+10)+'" x2="'+eqX+'" y2="'+(fBase+fH)+'" stroke="#0d9668" stroke-width="0.8" stroke-dasharray="3,3"/>';
+  html+='<text x="'+eqX+'" y="'+(atomAreaH+5)+'" text-anchor="middle" fill="#0d9668" font-size="10">r\u2080 (\uD3C9\uD615)</text>';
+  var mx=px(rVal);
+  html+='<line x1="'+mx+'" y1="'+(atomAreaH+10)+'" x2="'+mx+'" y2="'+(fBase+fH)+'" stroke="#d97706" stroke-width="0.6" stroke-dasharray="2,3" opacity="0.5"/>';
+  if(potentialState.total){var my=peY(lj(rVal));if(my>atomAreaH&&my<atomAreaH+eH) html+='<circle cx="'+mx+'" cy="'+my+'" r="6" fill="#2563eb" stroke="#fff" stroke-width="2"/>';}
+  if(potentialState.force){var fy=pfY(ljForce(rVal));if(fy>fBase&&fy<fBase+fH) html+='<circle cx="'+mx+'" cy="'+fy+'" r="6" fill="#d97706" stroke="#fff" stroke-width="2"/>';}
+  svg.innerHTML=html;
+}
+function toggleCurve(key){
+  potentialState[key]=!potentialState[key];
+  document.querySelectorAll('#as2 .toggle-btn').forEach(function(b){var k=b.textContent.indexOf('\uD569\uACC4')>=0?'total':b.textContent.indexOf('\uC778\uB825')>=0?'attract':b.textContent.indexOf('\uCC99\uB825')>=0?'repel':'force';b.classList.toggle('active',potentialState[k]);});
+  drawPotential();
+}
+function updatePotentialMarker(){drawPotential();}
+drawPotential();
+
+// SECTION 03: Stress atomic
+(function(){
+  var svg=document.getElementById('svg-stress-atomic');
+  var html='';
+  var cols=7,rows=5,sp=32,sx=50,sy=50;
+  for(var r=0;r<rows;r++) for(var c=0;c<cols;c++){
+    var x=sx+c*sp,y=sy+r*sp;
+    if(c<cols-1&&c!==3) html+='<line x1="'+(x+8)+'" y1="'+y+'" x2="'+(x+sp-8)+'" y2="'+y+'" stroke="#cbd5e1" stroke-width="0.8"/>';
+    if(r<rows-1) html+='<line x1="'+x+'" y1="'+(y+8)+'" x2="'+x+'" y2="'+(y+sp-8)+'" stroke="#cbd5e1" stroke-width="0.8"/>';
+  }
+  for(var r=0;r<rows;r++) for(var c=0;c<cols;c++){
+    var x=sx+c*sp,y=sy+r*sp;
+    html+='<circle cx="'+x+'" cy="'+y+'" r="7" fill="#dbeafe" stroke="'+(c<4?'#2563eb':'#0d9668')+'" stroke-width="1.2"/>';
+  }
+  var cutX=sx+3.5*sp;
+  html+='<line x1="'+cutX+'" y1="'+(sy-16)+'" x2="'+cutX+'" y2="'+(sy+4*sp+16)+'" stroke="#d97706" stroke-width="2" stroke-dasharray="8,4"/>';
+  html+='<text x="'+cutX+'" y="'+(sy-22)+'" text-anchor="middle" fill="#d97706" font-size="10" font-weight="500">\uAC00\uC0C1\uC758 \uC808\uB2E8\uBA74</text>';
+  for(var r=0;r<rows;r++){var y=sy+r*sp;html+='<line x1="'+(cutX-12)+'" y1="'+y+'" x2="'+(cutX+12)+'" y2="'+y+'" stroke="#dc2626" stroke-width="1.5"/>';html+='<polygon points="'+(cutX+12)+','+(y-2)+' '+(cutX+16)+','+y+' '+(cutX+12)+','+(y+2)+'" fill="#dc2626"/>';html+='<polygon points="'+(cutX-12)+','+(y-2)+' '+(cutX-16)+','+y+' '+(cutX-12)+','+(y+2)+'" fill="#dc2626"/>';}
+  var midY=sy+2*sp;
+  html+='<line x1="15" y1="'+midY+'" x2="35" y2="'+midY+'" stroke="#2563eb" stroke-width="2"/>';
+  html+='<polygon points="15,'+(midY-3)+' 9,'+midY+' 15,'+(midY+3)+'" fill="#2563eb"/>';
+  html+='<text x="8" y="'+(midY-8)+'" fill="#2563eb" font-size="9">F</text>';
+  var rEnd=sx+6*sp;
+  html+='<line x1="'+(rEnd+12)+'" y1="'+midY+'" x2="'+(rEnd+30)+'" y2="'+midY+'" stroke="#2563eb" stroke-width="2"/>';
+  html+='<polygon points="'+(rEnd+30)+','+(midY-3)+' '+(rEnd+36)+','+midY+' '+(rEnd+30)+','+(midY+3)+'" fill="#2563eb"/>';
+  html+='<text x="'+(rEnd+30)+'" y="'+(midY-8)+'" fill="#2563eb" font-size="9">F</text>';
+  html+='<text x="'+(sx+3*sp)+'" y="'+(sy+4*sp+38)+'" text-anchor="middle" fill="#6b7590" font-size="9">\uC804\uCCB4 \uACA9\uC790 + \uAC00\uC0C1\uC758 \uC808\uB2E8\uBA74</text>';
+  html+='<line x1="390" y1="20" x2="390" y2="310" stroke="#cbd5e1" stroke-width="0.5" stroke-dasharray="4,4"/>';
+  var rx0=440,ry0=50,rsp=36,rcols=4,rrows=5;
+  var rCutX=rx0-12;
+  html+='<line x1="'+rCutX+'" y1="'+(ry0-16)+'" x2="'+rCutX+'" y2="'+(ry0+4*rsp+16)+'" stroke="#d97706" stroke-width="2" stroke-dasharray="8,4"/>';
+  html+='<text x="'+(rCutX+2)+'" y="'+(ry0-22)+'" text-anchor="middle" fill="#d97706" font-size="10" font-weight="500">\uAC00\uC0C1\uC758 \uC808\uB2E8\uBA74</text>';
+  for(var r=0;r<rrows;r++) for(var c=0;c<rcols;c++){var x=rx0+c*rsp,y=ry0+r*rsp;if(c<rcols-1)html+='<line x1="'+(x+8)+'" y1="'+y+'" x2="'+(x+rsp-8)+'" y2="'+y+'" stroke="#cbd5e1" stroke-width="0.7"/>';if(r<rrows-1)html+='<line x1="'+x+'" y1="'+(y+8)+'" x2="'+x+'" y2="'+(y+rsp-8)+'" stroke="#cbd5e1" stroke-width="0.7"/>';}
+  for(var r=0;r<rrows;r++) for(var c=0;c<rcols;c++){var x=rx0+c*rsp,y=ry0+r*rsp;html+='<circle cx="'+x+'" cy="'+y+'" r="8" fill="#dbeafe" stroke="#0d9668" stroke-width="1.3"/>';}
+  var labels=['\u0066\u2081','\u0066\u2082','\u0066\u2083','\u0066\u2084','\u0066\u2085'];
+  for(var r=0;r<rrows;r++){var y=ry0+r*rsp;html+='<line x1="'+(rCutX+3)+'" y1="'+y+'" x2="'+(rx0-11)+'" y2="'+y+'" stroke="#dc2626" stroke-width="1.8"/>';html+='<polygon points="'+(rCutX+3)+','+(y-2.5)+' '+(rCutX-3)+','+y+' '+(rCutX+3)+','+(y+2.5)+'" fill="#dc2626"/>';html+='<text x="'+(rCutX-10)+'" y="'+(y-6)+'" fill="#dc2626" font-size="9">'+labels[r]+'</text>';}
+  var rMidY=ry0+2*rsp;
+  html+='<line x1="'+(rx0+3*rsp+12)+'" y1="'+rMidY+'" x2="'+(rx0+3*rsp+30)+'" y2="'+rMidY+'" stroke="#2563eb" stroke-width="2"/>';
+  html+='<polygon points="'+(rx0+3*rsp+30)+','+(rMidY-3)+' '+(rx0+3*rsp+36)+','+rMidY+' '+(rx0+3*rsp+30)+','+(rMidY+3)+'" fill="#2563eb"/>';
+  html+='<text x="'+(rx0+3*rsp+32)+'" y="'+(rMidY-8)+'" fill="#2563eb" font-size="9">F</text>';
+  html+='<text x="'+(rx0+rcols*rsp/2)+'" y="'+(ry0+4*rsp+34)+'" text-anchor="middle" fill="#6b7590" font-size="9.5">\u03C3 = (f\u2081+f\u2082+f\u2083+f\u2084+f\u2085) / A</text>';
+  html+='<text x="'+(rx0+rcols*rsp/2)+'" y="'+(ry0+4*rsp+48)+'" text-anchor="middle" fill="#6b7590" font-size="9">\uC6D0\uC790 \uAC04 \uD798\uC758 \uD569 \u2192 \uAC70\uC2DC\uC801 \uC751\uB825</text>';
+  svg.innerHTML=html;
+})();
+
+// SECTION 04: Strain atomic
+function updateStrainAtomic(){
+  var svg=document.getElementById('svg-strain-atomic');
+  var eps=document.getElementById('normalStrainA').value/100;
+  var gam=document.getElementById('shearStrainA').value/100;
+  document.getElementById('normalValA').textContent=eps.toFixed(3);
+  document.getElementById('shearValA').textContent=gam.toFixed(3);
+  var html='';
+  var rows=6,cols=7,sp=40,cx=400,cy=155;
+  for(var r=0;r<rows;r++) for(var c=0;c<cols;c++){
+    html+='<circle cx="'+(cx+(c-(cols-1)/2)*sp)+'" cy="'+(cy+(r-(rows-1)/2)*sp)+'" r="5" fill="none" stroke="#e2e8f0" stroke-width="1"/>';
+  }
+  for(var r=0;r<rows;r++) for(var c=0;c<cols;c++){
+    var bx=(c-(cols-1)/2)*sp, by=(r-(rows-1)/2)*sp;
+    var x=cx+bx*(1+eps)+gam*(-by);
+    var y=cy+by;
+    html+='<circle cx="'+x+'" cy="'+y+'" r="7" fill="#dbeafe" stroke="#2563eb" stroke-width="1.2"/>';
+    if(c<cols-1){var nx=cx+(bx+sp)*(1+eps)+gam*(-by);html+='<line x1="'+(x+7)+'" y1="'+y+'" x2="'+(nx-7)+'" y2="'+y+'" stroke="#cbd5e1" stroke-width="0.8"/>';}
+    if(r<rows-1){var nby=by+sp;var ny=cy+nby;var nx2=cx+bx*(1+eps)+gam*(-nby);html+='<line x1="'+x+'" y1="'+(y+7)+'" x2="'+nx2+'" y2="'+(ny-7)+'" stroke="#cbd5e1" stroke-width="0.8"/>';}
+  }
+  if(Math.abs(eps)>0.01) html+='<text x="'+cx+'" y="22" text-anchor="middle" fill="#2563eb" font-size="12">\u03B5 = '+eps.toFixed(3)+' ('+(eps>0?'\uC778\uC7A5':'\uC555\uCD95')+')</text>';
+  if(Math.abs(gam)>0.01) html+='<text x="'+cx+'" y="42" text-anchor="middle" fill="#d97706" font-size="12">\u03B3 = '+gam.toFixed(3)+' rad</text>';
+  svg.innerHTML=html;
+}
+updateStrainAtomic();
+
+// SECTION 05: Elastic
+var elasticState={stiff:true,soft:true,parabola:false};
+function ljCustom(r,sigma,epsilon){var s=sigma/r;return 4*epsilon*(Math.pow(s,12)-Math.pow(s,6));}
+function drawElastic(){
+  var svg=document.getElementById('svg-elastic');var html='';var H=300,xMin=2.0,xMax=7.0;
+  var px=function(r){return(r-xMin)/(xMax-xMin)*700+60;};
+  var py=function(e){return H/2-e*45;};
+  html+='<line x1="60" y1="20" x2="60" y2="'+H+'" stroke="#cbd5e1"/>';
+  html+='<line x1="60" y1="'+py(0)+'" x2="760" y2="'+py(0)+'" stroke="#cbd5e1" stroke-dasharray="4,4" stroke-width="0.5"/>';
+  html+='<text x="30" y="'+(H/2)+'" text-anchor="middle" fill="#6b7590" font-size="11" transform="rotate(-90,30,'+(H/2)+')">\uC5D0\uB108\uC9C0</text>';
+  html+='<text x="760" y="'+(H-5)+'" text-anchor="end" fill="#6b7590" font-size="11">r</text>';
+  function curve(sigma,eps4,color,label){
+    var r0=sigma*Math.pow(2,1/6);var d='';
+    for(var i=0;i<=200;i++){var r=xMin+i/200*(xMax-xMin);var y=py(ljCustom(r,sigma,eps4));if(y<0||y>H)continue;d+=(d?'L':'M')+px(r).toFixed(1)+','+y.toFixed(1);}
+    html+='<path d="'+d+'" fill="none" stroke="'+color+'" stroke-width="2"/>';
+    html+='<text x="'+(px(r0)+5)+'" y="'+(py(ljCustom(r0,sigma,eps4))-10)+'" fill="'+color+'" font-size="10">'+label+'</text>';
+    if(elasticState.parabola){var eMin=ljCustom(r0,sigma,eps4);var dr=0.001;var k=(ljCustom(r0+dr,sigma,eps4)+ljCustom(r0-dr,sigma,eps4)-2*eMin)/(dr*dr);var pd='';for(var i=0;i<=100;i++){var r=r0-0.8+i/100*1.6;var pe=eMin+0.5*k*(r-r0)*(r-r0);var yy=py(pe);if(yy<0||yy>H||r<xMin||r>xMax)continue;pd+=(pd?'L':'M')+px(r).toFixed(1)+','+yy.toFixed(1);}html+='<path d="'+pd+'" fill="none" stroke="'+color+'" stroke-width="1.5" stroke-dasharray="5,4" opacity="0.7"/>';}
+  }
+  if(elasticState.stiff)curve(2.6,1.8,'#2563eb','\uAC15\uD55C \uACB0\uD569');
+  if(elasticState.soft)curve(3.0,0.7,'#0d9668','\uC57D\uD55C \uACB0\uD569');
+  if(elasticState.parabola) html+='<text x="400" y="22" text-anchor="middle" fill="#6b7590" font-size="11">\uC810\uC120 = \uD3EC\uBB3C\uC120 \uADFC\uC0AC (\u2192 \uD6C5\uC758 \uBC95\uCE59)</text>';
+  svg.innerHTML=html;
+}
+function toggleElastic(key){elasticState[key]=!elasticState[key];document.querySelectorAll('#as5 .toggle-btn').forEach(function(b){var k=b.textContent.indexOf('\uAC15\uD55C')>=0?'stiff':b.textContent.indexOf('\uC57D\uD55C')>=0?'soft':'parabola';b.classList.toggle('active',elasticState[k]);});drawElastic();}
+drawElastic();
+
+// SECTION 06: Scale diagram
+(function(){
+  var svg=document.getElementById('svg-scale');var html='';
+  var levels=[{y:30,label:'\uAC70\uC2DC (m)',desc:'\uC751\uB825 \u03C3, \uBCC0\uD615\uB960 \u03B5, \uC601\uB960 E',color:'#2563eb',shape:'rect'},{y:100,label:'\uBBF8\uC2DC (\u03BCm)',desc:'\uACB0\uC815\uB9BD, \uC804\uC704, \uC2AC\uB9BD\uBA74',color:'#d97706',shape:'grain'},{y:170,label:'\uC6D0\uC790 (nm)',desc:'\uC6D0\uC790 \uAC04 \uACB0\uD569, \uD3EC\uD150\uC15C \uC5D0\uB108\uC9C0',color:'#0d9668',shape:'atom'}];
+  levels.forEach(function(lv,i){
+    html+='<rect x="60" y="'+lv.y+'" width="680" height="50" rx="8" fill="none" stroke="'+lv.color+'" stroke-width="1" opacity="0.3"/>';
+    html+='<text x="90" y="'+(lv.y+22)+'" fill="'+lv.color+'" font-size="13" font-weight="700">'+lv.label+'</text>';
+    html+='<text x="90" y="'+(lv.y+40)+'" fill="#6b7590" font-size="11">'+lv.desc+'</text>';
+    var cx=660,cy=lv.y+25;
+    if(lv.shape==='rect'){html+='<rect x="'+(cx-30)+'" y="'+(cy-12)+'" width="60" height="24" rx="3" fill="'+lv.color+'" opacity="0.15" stroke="'+lv.color+'" stroke-width="1"/>';html+='<line x1="'+(cx-45)+'" y1="'+cy+'" x2="'+(cx-32)+'" y2="'+cy+'" stroke="'+lv.color+'" stroke-width="1.5"/>';html+='<polygon points="'+(cx-45)+','+(cy-3)+' '+(cx-50)+','+cy+' '+(cx-45)+','+(cy+3)+'" fill="'+lv.color+'"/>';html+='<line x1="'+(cx+32)+'" y1="'+cy+'" x2="'+(cx+45)+'" y2="'+cy+'" stroke="'+lv.color+'" stroke-width="1.5"/>';html+='<polygon points="'+(cx+45)+','+(cy-3)+' '+(cx+50)+','+cy+' '+(cx+45)+','+(cy+3)+'" fill="'+lv.color+'"/>';}
+    else if(lv.shape==='grain'){html+='<polygon points="'+(cx-20)+','+(cy-10)+' '+(cx-5)+','+(cy-14)+' '+(cx+8)+','+(cy-6)+' '+(cx+4)+','+(cy+8)+' '+(cx-12)+','+(cy+12)+' '+(cx-22)+','+(cy+2)+'" fill="none" stroke="'+lv.color+'" stroke-width="1"/>';html+='<polygon points="'+(cx+8)+','+(cy-6)+' '+(cx+24)+','+(cy-12)+' '+(cx+30)+','+(cy+2)+' '+(cx+20)+','+(cy+14)+' '+(cx+4)+','+(cy+8)+'" fill="none" stroke="'+lv.color+'" stroke-width="1"/>';}
+    else{for(var a=0;a<3;a++) for(var b=0;b<2;b++){html+='<circle cx="'+(cx-15+a*15)+'" cy="'+(cy-8+b*16)+'" r="5" fill="none" stroke="'+lv.color+'" stroke-width="1"/>';if(a<2)html+='<line x1="'+(cx-10+a*15)+'" y1="'+(cy-8+b*16)+'" x2="'+(cx+a*15)+'" y2="'+(cy-8+b*16)+'" stroke="'+lv.color+'" stroke-width="0.5" opacity="0.5"/>';}}
+    if(i<levels.length-1){var ny=levels[i+1].y;html+='<line x1="400" y1="'+(lv.y+50)+'" x2="400" y2="'+ny+'" stroke="#6b7590" stroke-width="1" stroke-dasharray="3,3"/>';html+='<polygon points="397,'+ny+' 400,'+(ny+4)+' 403,'+ny+'" fill="#6b7590"/>';}
+  });
+  svg.innerHTML=html;
+})();
+</script>
+
+</body>
+</html>
