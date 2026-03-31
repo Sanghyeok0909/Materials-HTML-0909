@@ -1,0 +1,1019 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mild Steel 응력-변형률 곡선 — 원자 관점의 이해</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;600;700;900&family=Noto+Serif+KR:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --ink: #1a1a2e;
+    --paper: #faf9f6;
+    --accent: #c0392b;
+    --accent2: #2980b9;
+    --gray: #7f8c8d;
+    --light-gray: #ecf0f1;
+    --warm: #f5f0e8;
+  }
+
+  body {
+    font-family: 'Noto Sans KR', sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    line-height: 1.8;
+    font-size: 16px;
+    font-weight: 400;
+  }
+
+  .page {
+    max-width: 820px;
+    margin: 0 auto;
+    padding: 60px 32px 100px;
+  }
+
+  /* Header */
+  header {
+    text-align: center;
+    margin-bottom: 64px;
+    padding-bottom: 40px;
+    border-bottom: 3px solid var(--ink);
+  }
+
+  header h1 {
+    font-family: 'Noto Serif KR', serif;
+    font-size: 2.2rem;
+    font-weight: 700;
+    line-height: 1.4;
+    margin-bottom: 12px;
+  }
+
+  header .subtitle {
+    font-size: 1rem;
+    color: var(--gray);
+    font-weight: 300;
+  }
+
+  /* Overview curve */
+  .overview {
+    background: var(--warm);
+    border-radius: 12px;
+    padding: 36px 32px;
+    margin-bottom: 56px;
+  }
+
+  .overview h2 {
+    font-family: 'Noto Serif KR', serif;
+    font-size: 1.1rem;
+    margin-bottom: 16px;
+    color: var(--accent);
+  }
+
+  .overview svg {
+    width: 100%;
+    max-width: 720px;
+    display: block;
+    margin: 0 auto;
+  }
+
+  .overview .caption {
+    text-align: center;
+    font-size: 0.85rem;
+    color: var(--gray);
+    margin-top: 12px;
+  }
+
+  /* Stage sections */
+  .stage {
+    margin-bottom: 56px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+    align-items: start;
+  }
+
+  @media (max-width: 640px) {
+    .stage { grid-template-columns: 1fr; }
+  }
+
+  .stage-number {
+    font-family: 'Noto Serif KR', serif;
+    font-size: 3rem;
+    font-weight: 900;
+    color: var(--light-gray);
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .stage-title {
+    font-family: 'Noto Serif KR', serif;
+    font-size: 1.3rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--accent);
+    display: inline-block;
+  }
+
+  .stage-text p {
+    margin-bottom: 12px;
+    font-size: 0.95rem;
+    line-height: 1.9;
+  }
+
+  .stage-text .key {
+    background: #ffeaa7;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-weight: 600;
+  }
+
+  .stage-diagram {
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    padding: 20px;
+    text-align: center;
+  }
+
+  .stage-diagram svg {
+    width: 100%;
+    max-width: 320px;
+  }
+
+  .stage-diagram .dia-caption {
+    font-size: 0.8rem;
+    color: var(--gray);
+    margin-top: 10px;
+    line-height: 1.5;
+  }
+
+  /* Analogy box */
+  .analogy {
+    background: #eaf6ff;
+    border-left: 4px solid var(--accent2);
+    padding: 14px 18px;
+    border-radius: 0 8px 8px 0;
+    margin-top: 12px;
+    font-size: 0.88rem;
+  }
+
+  .analogy::before {
+    content: "💡 비유 — ";
+    font-weight: 700;
+  }
+
+  /* Divider */
+  .divider {
+    height: 1px;
+    background: #ddd;
+    margin: 48px 0;
+  }
+
+  /* Summary */
+  .summary {
+    background: var(--ink);
+    color: white;
+    border-radius: 12px;
+    padding: 36px 32px;
+    margin-top: 56px;
+  }
+
+  .summary h2 {
+    font-family: 'Noto Serif KR', serif;
+    font-size: 1.2rem;
+    margin-bottom: 20px;
+    color: #ffeaa7;
+  }
+
+  .summary svg {
+    width: 100%;
+    max-width: 700px;
+    display: block;
+    margin: 0 auto;
+  }
+
+  .flow-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+    margin-top: 24px;
+  }
+
+  .flow-item {
+    background: rgba(255,255,255,0.1);
+    padding: 10px 16px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    text-align: center;
+    flex: 1 1 130px;
+    max-width: 160px;
+  }
+
+  .flow-item .fi-title {
+    font-weight: 700;
+    color: #ffeaa7;
+    margin-bottom: 4px;
+  }
+
+  .flow-item .fi-desc {
+    font-size: 0.78rem;
+    color: #bbb;
+  }
+
+  .arrow-between {
+    display: flex;
+    align-items: center;
+    color: #888;
+    font-size: 1.2rem;
+  }
+
+  footer {
+    text-align: center;
+    margin-top: 48px;
+    font-size: 0.8rem;
+    color: var(--gray);
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+<header>
+  <h1>Mild Steel 응력-변형률 곡선<br>원자 관점의 이해</h1>
+  <p class="subtitle">각 단계에서 원자와 전위(dislocation)에 무슨 일이 일어나는가</p>
+</header>
+
+<!-- Overview Curve -->
+<div class="overview">
+  <h2>전체 응력-변형률 곡선</h2>
+  <svg viewBox="0 0 720 300" xmlns="http://www.w3.org/2000/svg">
+    <!-- Grid -->
+    <line x1="80" y1="250" x2="680" y2="250" stroke="#ccc" stroke-width="1"/>
+    <line x1="80" y1="250" x2="80" y2="30" stroke="#ccc" stroke-width="1"/>
+    <!-- Axis labels -->
+    <text x="380" y="290" text-anchor="middle" font-size="13" fill="#555" font-family="Noto Sans KR">변형률 (Strain) ε</text>
+    <text x="30" y="140" text-anchor="middle" font-size="13" fill="#555" font-family="Noto Sans KR" transform="rotate(-90,30,140)">응력 (Stress) σ</text>
+
+    <!-- Curve path -->
+    <path d="M80,250 L160,120
+             L162,130 L170,132 L180,130 L190,132 L200,130 L210,132 L260,130
+             Q300,128 360,80
+             Q420,60 440,65
+             Q500,70 540,90
+             L580,140"
+          fill="none" stroke="#c0392b" stroke-width="2.5" stroke-linecap="round"/>
+
+    <!-- X mark for fracture -->
+    <line x1="575" y1="135" x2="585" y2="145" stroke="#c0392b" stroke-width="3"/>
+    <line x1="585" y1="135" x2="575" y2="145" stroke="#c0392b" stroke-width="3"/>
+
+    <!-- Region backgrounds -->
+    <rect x="80" y="30" width="80" height="220" fill="#2980b9" opacity="0.06" rx="4"/>
+    <rect x="160" y="30" width="100" height="220" fill="#27ae60" opacity="0.06" rx="4"/>
+    <rect x="260" y="30" width="180" height="220" fill="#e67e22" opacity="0.06" rx="4"/>
+    <rect x="440" y="30" width="140" height="220" fill="#c0392b" opacity="0.06" rx="4"/>
+
+    <!-- Region labels -->
+    <text x="120" y="48" text-anchor="middle" font-size="11" fill="#2980b9" font-weight="600" font-family="Noto Sans KR">① 탄성</text>
+    <text x="210" y="48" text-anchor="middle" font-size="11" fill="#27ae60" font-weight="600" font-family="Noto Sans KR">② 항복</text>
+    <text x="350" y="48" text-anchor="middle" font-size="11" fill="#e67e22" font-weight="600" font-family="Noto Sans KR">③ 변형경화</text>
+    <text x="510" y="48" text-anchor="middle" font-size="11" fill="#c0392b" font-weight="600" font-family="Noto Sans KR">④ 넥킹·파단</text>
+
+    <!-- Key points -->
+    <circle cx="160" cy="120" r="4" fill="#27ae60"/>
+    <text x="158" y="110" text-anchor="end" font-size="10" fill="#27ae60" font-family="Noto Sans KR">상항복점</text>
+
+    <circle cx="260" cy="130" r="4" fill="#27ae60"/>
+    <text x="262" y="148" font-size="10" fill="#27ae60" font-family="Noto Sans KR">하항복점</text>
+
+    <circle cx="440" cy="65" r="4" fill="#e67e22"/>
+    <text x="438" y="56" text-anchor="end" font-size="10" fill="#e67e22" font-family="Noto Sans KR">UTS</text>
+
+    <circle cx="580" cy="140" r="4" fill="#c0392b"/>
+    <text x="590" y="138" font-size="10" fill="#c0392b" font-family="Noto Sans KR">파단</text>
+
+    <!-- Luders band region indicator -->
+    <line x1="160" y1="258" x2="260" y2="258" stroke="#27ae60" stroke-width="2"/>
+    <text x="210" y="272" text-anchor="middle" font-size="9" fill="#27ae60" font-family="Noto Sans KR">뤼더스 밴드 전파</text>
+  </svg>
+  <p class="caption">Mild steel의 공칭 응력-변형률 곡선. 각 영역에서 원자 수준의 메커니즘이 다르다.</p>
+</div>
+
+<!-- ========== STAGE 1: ELASTIC ========== -->
+<div class="stage">
+  <div class="stage-text">
+    <div class="stage-number">01</div>
+    <div class="stage-title">탄성 영역 (Elastic Region)</div>
+    <p>외력이 가해지면 BCC 철 격자의 원자들이 <span class="key">평형 위치에서 약간 밀려남</span>. 인장 방향으로는 원자 간 거리가 늘어나고, 수직 방향으로는 포아송 효과로 약간 수축한다. 결합은 끊어지지 않는다.</p>
+    <p>힘을 제거하면 원자 간 인력·척력의 균형에 의해 <span class="key">원래 위치로 복원</span>. 이것이 탄성의 본질이다.</p>
+    <p>이 영역에서 응력과 변형률이 비례하는 이유: 원자 간 포텐셜 에너지 곡선의 평형점 부근은 거의 포물선(2차 함수) 형태이므로, 복원력이 변위에 비례한다(Hooke's Law의 원자적 기원).</p>
+    <p><strong>탄성계수(E) = 원자 결합의 강성</strong>. BCC 철은 약 210 GPa. 같은 금속이면 합금 성분과 무관하게 거의 일정하다.</p>
+    <div class="analogy">스프링을 살짝 잡아당겼다 놓으면 원래로 돌아간다. 원자 결합이 곧 스프링이다.</div>
+  </div>
+  <div class="stage-diagram">
+    <svg viewBox="0 0 280 260" xmlns="http://www.w3.org/2000/svg">
+      <!-- Title -->
+      <text x="140" y="20" text-anchor="middle" font-size="12" fill="#2980b9" font-weight="600" font-family="Noto Sans KR">원자 결합이 늘어남 (복원 가능)</text>
+
+      <!-- Before: normal lattice -->
+      <text x="70" y="38" text-anchor="middle" font-size="10" fill="#888" font-family="Noto Sans KR">하중 전</text>
+      <g transform="translate(20,55)">
+        <!-- Row 1 -->
+        <circle cx="20" cy="20" r="10" fill="#3498db" opacity="0.8"/>
+        <circle cx="50" cy="20" r="10" fill="#3498db" opacity="0.8"/>
+        <circle cx="80" cy="20" r="10" fill="#3498db" opacity="0.8"/>
+        <!-- Row 2 -->
+        <circle cx="20" cy="50" r="10" fill="#3498db" opacity="0.8"/>
+        <circle cx="50" cy="50" r="10" fill="#3498db" opacity="0.8"/>
+        <circle cx="80" cy="50" r="10" fill="#3498db" opacity="0.8"/>
+        <!-- Row 3 -->
+        <circle cx="20" cy="80" r="10" fill="#3498db" opacity="0.8"/>
+        <circle cx="50" cy="80" r="10" fill="#3498db" opacity="0.8"/>
+        <circle cx="80" cy="80" r="10" fill="#3498db" opacity="0.8"/>
+        <!-- Bonds -->
+        <line x1="30" y1="20" x2="40" y2="20" stroke="#aaa" stroke-width="1.5"/>
+        <line x1="60" y1="20" x2="70" y2="20" stroke="#aaa" stroke-width="1.5"/>
+        <line x1="30" y1="50" x2="40" y2="50" stroke="#aaa" stroke-width="1.5"/>
+        <line x1="60" y1="50" x2="70" y2="50" stroke="#aaa" stroke-width="1.5"/>
+        <line x1="30" y1="80" x2="40" y2="80" stroke="#aaa" stroke-width="1.5"/>
+        <line x1="60" y1="80" x2="70" y2="80" stroke="#aaa" stroke-width="1.5"/>
+        <line x1="20" y1="30" x2="20" y2="40" stroke="#aaa" stroke-width="1.5"/>
+        <line x1="50" y1="30" x2="50" y2="40" stroke="#aaa" stroke-width="1.5"/>
+        <line x1="80" y1="30" x2="80" y2="40" stroke="#aaa" stroke-width="1.5"/>
+        <line x1="20" y1="60" x2="20" y2="70" stroke="#aaa" stroke-width="1.5"/>
+        <line x1="50" y1="60" x2="50" y2="70" stroke="#aaa" stroke-width="1.5"/>
+        <line x1="80" y1="60" x2="80" y2="70" stroke="#aaa" stroke-width="1.5"/>
+      </g>
+
+      <!-- After: stretched lattice -->
+      <text x="210" y="38" text-anchor="middle" font-size="10" fill="#888" font-family="Noto Sans KR">인장 하중</text>
+      <g transform="translate(150,55)">
+        <!-- Arrows showing tensile direction -->
+        <line x1="50" y1="0" x2="50" y2="-12" stroke="#c0392b" stroke-width="2" marker-end="url(#arrowRed)"/>
+        <line x1="50" y1="100" x2="50" y2="112" stroke="#c0392b" stroke-width="2" marker-end="url(#arrowRed)"/>
+
+        <!-- Row 1 - stretched vertically, compressed horizontally -->
+        <circle cx="25" cy="12" r="10" fill="#3498db" opacity="0.8"/>
+        <circle cx="50" cy="12" r="10" fill="#3498db" opacity="0.8"/>
+        <circle cx="75" cy="12" r="10" fill="#3498db" opacity="0.8"/>
+        <!-- Row 2 -->
+        <circle cx="25" cy="50" r="10" fill="#3498db" opacity="0.8"/>
+        <circle cx="50" cy="50" r="10" fill="#3498db" opacity="0.8"/>
+        <circle cx="75" cy="50" r="10" fill="#3498db" opacity="0.8"/>
+        <!-- Row 3 -->
+        <circle cx="25" cy="88" r="10" fill="#3498db" opacity="0.8"/>
+        <circle cx="50" cy="88" r="10" fill="#3498db" opacity="0.8"/>
+        <circle cx="75" cy="88" r="10" fill="#3498db" opacity="0.8"/>
+        <!-- Vertical bonds: STRETCHED (longer, red dashed) -->
+        <line x1="25" y1="22" x2="25" y2="40" stroke="#e74c3c" stroke-width="1.5" stroke-dasharray="3,2"/>
+        <line x1="50" y1="22" x2="50" y2="40" stroke="#e74c3c" stroke-width="1.5" stroke-dasharray="3,2"/>
+        <line x1="75" y1="22" x2="75" y2="40" stroke="#e74c3c" stroke-width="1.5" stroke-dasharray="3,2"/>
+        <line x1="25" y1="60" x2="25" y2="78" stroke="#e74c3c" stroke-width="1.5" stroke-dasharray="3,2"/>
+        <line x1="50" y1="60" x2="50" y2="78" stroke="#e74c3c" stroke-width="1.5" stroke-dasharray="3,2"/>
+        <line x1="75" y1="60" x2="75" y2="78" stroke="#e74c3c" stroke-width="1.5" stroke-dasharray="3,2"/>
+        <!-- Horizontal bonds: COMPRESSED (shorter, gray) -->
+        <line x1="35" y1="12" x2="40" y2="12" stroke="#aaa" stroke-width="1.5"/>
+        <line x1="60" y1="12" x2="65" y2="12" stroke="#aaa" stroke-width="1.5"/>
+        <line x1="35" y1="50" x2="40" y2="50" stroke="#aaa" stroke-width="1.5"/>
+        <line x1="60" y1="50" x2="65" y2="50" stroke="#aaa" stroke-width="1.5"/>
+        <line x1="35" y1="88" x2="40" y2="88" stroke="#aaa" stroke-width="1.5"/>
+        <line x1="60" y1="88" x2="65" y2="88" stroke="#aaa" stroke-width="1.5"/>
+        <!-- Labels -->
+        <text x="100" y="35" font-size="7" fill="#e74c3c" font-family="Noto Sans KR">늘어남</text>
+        <text x="100" y="12" font-size="7" fill="#aaa" font-family="Noto Sans KR">수축</text>
+      </g>
+
+      <!-- Defs -->
+      <defs>
+        <marker id="arrowRed" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto">
+          <path d="M0,0 L6,3 L0,6 Z" fill="#c0392b"/>
+        </marker>
+      </defs>
+
+      <!-- Potential curve mini -->
+      <text x="140" y="180" text-anchor="middle" font-size="9" fill="#888" font-family="Noto Sans KR">원자 간 포텐셜 에너지</text>
+      <g transform="translate(60,192)">
+        <path d="M10,50 Q40,-15 70,5 Q100,18 150,45" fill="none" stroke="#2980b9" stroke-width="2"/>
+        <circle cx="55" cy="1" r="3" fill="#c0392b"/>
+        <text x="75" y="4" font-size="7" fill="#c0392b" font-family="Noto Sans KR">← 평형점</text>
+        <line x1="0" y1="55" x2="160" y2="55" stroke="#ddd" stroke-width="1"/>
+        <text x="80" y="66" text-anchor="middle" font-size="7" fill="#aaa" font-family="Noto Sans KR">원자 간 거리 →</text>
+      </g>
+    </svg>
+    <p class="dia-caption">왼쪽: 평형 상태 격자. 오른쪽: 인장(↕) 방향 결합 늘어남,<br>직각 방향 수축(포아송 효과). 아래: 평형점 부근 → Hooke's Law</p>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ========== STAGE 2: YIELD ========== -->
+<div class="stage">
+  <div class="stage-text">
+    <div class="stage-number">02</div>
+    <div class="stage-title">항복 (Yield Point)</div>
+    <p>Mild steel에는 탄소(C)·질소(N) 같은 작은 침입형 원자가 있다. 이들이 전위(dislocation) 주변으로 모여들어 <span class="key">Cottrell 분위기</span>를 형성하고, 전위를 제자리에 고정(pinning)시킨다.</p>
+    <p><strong>상항복점</strong>: 고정된 전위를 움직이려면 큰 힘이 필요. 이 높은 응력이 상항복점이다.</p>
+    <p><strong>하항복점</strong>: 상항복점의 높은 응력에서 전위가 Cottrell 분위기로부터 풀려나고(unpinning), 이 과정에서 Frank-Read source 등을 통해 <span class="key">Cottrell 분위기에 묶이지 않은 새 전위가 대량 생성</span>된다. 이 새 전위들은 더 낮은 응력에서도 자유롭게 이동 가능 → 응력이 떨어진다.</p>
+    <p>이 새 전위들의 이동이 <span class="key">뤼더스 밴드</span>로 나타나며, 시편을 따라 일정 응력에서 전파된다.</p>
+    <div class="analogy">정지 마찰 > 운동 마찰과 비슷하다. 처음 움직이기 시작할 때 큰 힘이 필요하고(상항복점), 일단 움직이면 더 적은 힘으로도 계속 움직인다(하항복점).</div>
+  </div>
+  <div class="stage-diagram">
+    <svg viewBox="0 0 280 320" xmlns="http://www.w3.org/2000/svg">
+      <text x="140" y="18" text-anchor="middle" font-size="11" fill="#27ae60" font-weight="600" font-family="Noto Sans KR">전위 고정과 해방</text>
+
+      <!-- Before: pinned dislocation with lattice bonds -->
+      <text x="130" y="38" text-anchor="middle" font-size="9" fill="#888" font-family="Noto Sans KR">항복 전: 전위가 C 원자에 고정됨</text>
+      <g transform="translate(15,42)">
+        <!-- 
+          Lattice with edge dislocation. 
+          Above slip plane: 5 columns normal + 1 extra half-plane column (col E) from top down to slip plane.
+          Below slip plane: 5 columns only, slightly distorted near dislocation.
+          Grid spacing: ~30px horizontal, ~22px vertical.
+        -->
+
+        <!-- === BONDS FIRST (drawn behind atoms) === -->
+        <!-- Row 0→1 vertical bonds (above slip) -->
+        <line x1="10" y1="5" x2="10" y2="27" stroke="#555" stroke-width="1.8"/>
+        <line x1="40" y1="5" x2="40" y2="27" stroke="#555" stroke-width="1.8"/>
+        <line x1="70" y1="5" x2="70" y2="27" stroke="#555" stroke-width="1.8"/>
+        <line x1="100" y1="5" x2="100" y2="27" stroke="#555" stroke-width="1.8"/>
+        <!-- Extra half-plane bonds -->
+        <line x1="120" y1="5" x2="120" y2="27" stroke="#e74c3c" stroke-width="2"/>
+        <line x1="140" y1="5" x2="140" y2="27" stroke="#555" stroke-width="1.8"/>
+        <line x1="170" y1="5" x2="170" y2="27" stroke="#555" stroke-width="1.8"/>
+        <line x1="200" y1="5" x2="200" y2="27" stroke="#555" stroke-width="1.8"/>
+        <line x1="230" y1="5" x2="230" y2="27" stroke="#555" stroke-width="1.8"/>
+
+        <!-- Row 1→2 vertical bonds (above slip, extra col bends toward core) -->
+        <line x1="10" y1="27" x2="10" y2="49" stroke="#555" stroke-width="1.8"/>
+        <line x1="40" y1="27" x2="40" y2="49" stroke="#555" stroke-width="1.8"/>
+        <line x1="70" y1="27" x2="72" y2="49" stroke="#555" stroke-width="1.8"/>
+        <line x1="100" y1="27" x2="102" y2="49" stroke="#555" stroke-width="1.8"/>
+        <!-- Extra half-plane: terminates here -->
+        <line x1="120" y1="27" x2="120" y2="49" stroke="#e74c3c" stroke-width="2" stroke-dasharray="4,2"/>
+        <line x1="140" y1="27" x2="138" y2="49" stroke="#555" stroke-width="1.8"/>
+        <line x1="170" y1="27" x2="170" y2="49" stroke="#555" stroke-width="1.8"/>
+        <line x1="200" y1="27" x2="200" y2="49" stroke="#555" stroke-width="1.8"/>
+        <line x1="230" y1="27" x2="230" y2="49" stroke="#555" stroke-width="1.8"/>
+
+        <!-- Row 2→3 vertical bonds (across slip plane, distorted near core) -->
+        <!-- === SLIP PLANE at y=60 (between Row 2 and Row 3) === -->
+        <line x1="0" y1="60" x2="240" y2="60" stroke="#27ae60" stroke-width="1.2" stroke-dasharray="5,3" opacity="0.7"/>
+        <text x="242" y="63" font-size="6" fill="#27ae60" font-family="Noto Sans KR">슬립면</text>
+        <line x1="10" y1="49" x2="15" y2="74" stroke="#555" stroke-width="1.8"/>
+        <line x1="40" y1="49" x2="45" y2="74" stroke="#555" stroke-width="1.8"/>
+        <line x1="72" y1="49" x2="75" y2="74" stroke="#555" stroke-width="1.8"/>
+        <line x1="102" y1="49" x2="105" y2="74" stroke="#555" stroke-width="1.8"/>
+        <!-- No bond from extra col to below — it terminates! -->
+        <line x1="138" y1="49" x2="140" y2="74" stroke="#555" stroke-width="1.8"/>
+        <line x1="170" y1="49" x2="172" y2="74" stroke="#555" stroke-width="1.8"/>
+        <line x1="200" y1="49" x2="200" y2="74" stroke="#555" stroke-width="1.8"/>
+        <line x1="230" y1="49" x2="230" y2="74" stroke="#555" stroke-width="1.8"/>
+
+        <!-- Row 3→4 vertical bonds (below slip, normal) -->
+        <line x1="15" y1="74" x2="15" y2="96" stroke="#555" stroke-width="1.8"/>
+        <line x1="45" y1="74" x2="45" y2="96" stroke="#555" stroke-width="1.8"/>
+        <line x1="75" y1="74" x2="75" y2="96" stroke="#555" stroke-width="1.8"/>
+        <line x1="105" y1="74" x2="108" y2="96" stroke="#555" stroke-width="1.8"/>
+        <line x1="140" y1="74" x2="140" y2="96" stroke="#555" stroke-width="1.8"/>
+        <line x1="172" y1="74" x2="172" y2="96" stroke="#555" stroke-width="1.8"/>
+        <line x1="200" y1="74" x2="200" y2="96" stroke="#555" stroke-width="1.8"/>
+        <line x1="230" y1="74" x2="230" y2="96" stroke="#555" stroke-width="1.8"/>
+
+        <!-- Horizontal bonds: Row 0 -->
+        <line x1="10" y1="5" x2="40" y2="5" stroke="#555" stroke-width="1.8"/>
+        <line x1="40" y1="5" x2="70" y2="5" stroke="#555" stroke-width="1.8"/>
+        <line x1="70" y1="5" x2="100" y2="5" stroke="#555" stroke-width="1.8"/>
+        <line x1="100" y1="5" x2="120" y2="5" stroke="#e74c3c" stroke-width="1.8"/>
+        <line x1="120" y1="5" x2="140" y2="5" stroke="#e74c3c" stroke-width="1.8"/>
+        <line x1="140" y1="5" x2="170" y2="5" stroke="#555" stroke-width="1.8"/>
+        <line x1="170" y1="5" x2="200" y2="5" stroke="#555" stroke-width="1.8"/>
+        <line x1="200" y1="5" x2="230" y2="5" stroke="#555" stroke-width="1.8"/>
+        <!-- Row 1 -->
+        <line x1="10" y1="27" x2="40" y2="27" stroke="#555" stroke-width="1.8"/>
+        <line x1="40" y1="27" x2="70" y2="27" stroke="#555" stroke-width="1.8"/>
+        <line x1="70" y1="27" x2="100" y2="27" stroke="#555" stroke-width="1.8"/>
+        <line x1="100" y1="27" x2="120" y2="27" stroke="#e74c3c" stroke-width="1.8"/>
+        <line x1="120" y1="27" x2="140" y2="27" stroke="#e74c3c" stroke-width="1.8"/>
+        <line x1="140" y1="27" x2="170" y2="27" stroke="#555" stroke-width="1.8"/>
+        <line x1="170" y1="27" x2="200" y2="27" stroke="#555" stroke-width="1.8"/>
+        <line x1="200" y1="27" x2="230" y2="27" stroke="#555" stroke-width="1.8"/>
+        <!-- Row 2 (distorted near core) -->
+        <line x1="10" y1="49" x2="40" y2="49" stroke="#555" stroke-width="1.8"/>
+        <line x1="40" y1="49" x2="72" y2="49" stroke="#555" stroke-width="1.8"/>
+        <line x1="72" y1="49" x2="102" y2="49" stroke="#555" stroke-width="1.8"/>
+        <line x1="102" y1="49" x2="120" y2="49" stroke="#555" stroke-width="1.5" stroke-dasharray="3,2"/>
+        <line x1="120" y1="49" x2="138" y2="49" stroke="#555" stroke-width="1.5" stroke-dasharray="3,2"/>
+        <line x1="138" y1="49" x2="170" y2="49" stroke="#555" stroke-width="1.8"/>
+        <line x1="170" y1="49" x2="200" y2="49" stroke="#555" stroke-width="1.8"/>
+        <line x1="200" y1="49" x2="230" y2="49" stroke="#555" stroke-width="1.8"/>
+        <!-- Row 3 (below slip) -->
+        <line x1="15" y1="74" x2="45" y2="74" stroke="#555" stroke-width="1.8"/>
+        <line x1="45" y1="74" x2="75" y2="74" stroke="#555" stroke-width="1.8"/>
+        <line x1="75" y1="74" x2="105" y2="74" stroke="#555" stroke-width="1.8"/>
+        <line x1="105" y1="74" x2="140" y2="74" stroke="#555" stroke-width="1.8"/>
+        <line x1="140" y1="74" x2="172" y2="74" stroke="#555" stroke-width="1.8"/>
+        <line x1="172" y1="74" x2="200" y2="74" stroke="#555" stroke-width="1.8"/>
+        <line x1="200" y1="74" x2="230" y2="74" stroke="#555" stroke-width="1.8"/>
+        <!-- Row 4 -->
+        <line x1="15" y1="96" x2="45" y2="96" stroke="#555" stroke-width="1.8"/>
+        <line x1="45" y1="96" x2="75" y2="96" stroke="#555" stroke-width="1.8"/>
+        <line x1="75" y1="96" x2="108" y2="96" stroke="#555" stroke-width="1.8"/>
+        <line x1="108" y1="96" x2="140" y2="96" stroke="#555" stroke-width="1.8"/>
+        <line x1="140" y1="96" x2="172" y2="96" stroke="#555" stroke-width="1.8"/>
+        <line x1="172" y1="96" x2="200" y2="96" stroke="#555" stroke-width="1.8"/>
+        <line x1="200" y1="96" x2="230" y2="96" stroke="#555" stroke-width="1.8"/>
+
+        <!-- === ATOMS (drawn on top of bonds) === -->
+        <!-- Row 0: 9 atoms (including extra) -->
+        <circle cx="10" cy="5" r="6" fill="#4aa3df"/>
+        <circle cx="40" cy="5" r="6" fill="#4aa3df"/>
+        <circle cx="70" cy="5" r="6" fill="#4aa3df"/>
+        <circle cx="100" cy="5" r="6" fill="#4aa3df"/>
+        <circle cx="120" cy="5" r="6" fill="#e74c3c"/>
+        <circle cx="140" cy="5" r="6" fill="#4aa3df"/>
+        <circle cx="170" cy="5" r="6" fill="#4aa3df"/>
+        <circle cx="200" cy="5" r="6" fill="#4aa3df"/>
+        <circle cx="230" cy="5" r="6" fill="#4aa3df"/>
+        <!-- Row 1: 9 atoms -->
+        <circle cx="10" cy="27" r="6" fill="#4aa3df"/>
+        <circle cx="40" cy="27" r="6" fill="#4aa3df"/>
+        <circle cx="70" cy="27" r="6" fill="#4aa3df"/>
+        <circle cx="100" cy="27" r="6" fill="#4aa3df"/>
+        <circle cx="120" cy="27" r="6" fill="#e74c3c"/>
+        <circle cx="140" cy="27" r="6" fill="#4aa3df"/>
+        <circle cx="170" cy="27" r="6" fill="#4aa3df"/>
+        <circle cx="200" cy="27" r="6" fill="#4aa3df"/>
+        <circle cx="230" cy="27" r="6" fill="#4aa3df"/>
+        <!-- Row 2: 9 atoms (extra col terminates, distorted) -->
+        <circle cx="10" cy="49" r="6" fill="#4aa3df"/>
+        <circle cx="40" cy="49" r="6" fill="#4aa3df"/>
+        <circle cx="72" cy="49" r="6" fill="#4aa3df"/>
+        <circle cx="102" cy="49" r="6" fill="#4aa3df"/>
+        <circle cx="120" cy="49" r="5" fill="#e74c3c" opacity="0.7"/>
+        <circle cx="138" cy="49" r="6" fill="#4aa3df"/>
+        <circle cx="170" cy="49" r="6" fill="#4aa3df"/>
+        <circle cx="200" cy="49" r="6" fill="#4aa3df"/>
+        <circle cx="230" cy="49" r="6" fill="#4aa3df"/>
+        <!-- Row 3: 8 atoms (NO extra column below slip) -->
+        <circle cx="15" cy="74" r="6" fill="#4aa3df"/>
+        <circle cx="45" cy="74" r="6" fill="#4aa3df"/>
+        <circle cx="75" cy="74" r="6" fill="#4aa3df"/>
+        <circle cx="105" cy="74" r="6" fill="#4aa3df"/>
+        <circle cx="140" cy="74" r="6" fill="#4aa3df"/>
+        <circle cx="172" cy="74" r="6" fill="#4aa3df"/>
+        <circle cx="200" cy="74" r="6" fill="#4aa3df"/>
+        <circle cx="230" cy="74" r="6" fill="#4aa3df"/>
+        <!-- Row 4: 8 atoms -->
+        <circle cx="15" cy="96" r="6" fill="#4aa3df"/>
+        <circle cx="45" cy="96" r="6" fill="#4aa3df"/>
+        <circle cx="75" cy="96" r="6" fill="#4aa3df"/>
+        <circle cx="108" cy="96" r="6" fill="#4aa3df"/>
+        <circle cx="140" cy="96" r="6" fill="#4aa3df"/>
+        <circle cx="172" cy="96" r="6" fill="#4aa3df"/>
+        <circle cx="200" cy="96" r="6" fill="#4aa3df"/>
+        <circle cx="230" cy="96" r="6" fill="#4aa3df"/>
+
+        <!-- Labels -->
+        <text x="120" y="-14" text-anchor="middle" font-size="7" fill="#e74c3c" font-family="Noto Sans KR">잉여 반면</text>
+        <text x="120" y="62" text-anchor="middle" font-size="9" fill="#e74c3c" font-weight="700">⊥</text>
+
+        <!-- C atoms at dislocation core -->
+        <circle cx="111" cy="57" r="3.5" fill="#f39c12"/>
+        <text x="111" y="59.5" text-anchor="middle" font-size="4.5" fill="white" font-weight="700">C</text>
+        <circle cx="129" cy="57" r="3.5" fill="#f39c12"/>
+        <text x="129" y="59.5" text-anchor="middle" font-size="4.5" fill="white" font-weight="700">C</text>
+        <text x="120" y="86" text-anchor="middle" font-size="8" fill="#f39c12">🔒</text>
+      </g>
+
+      <!-- After: new dislocations generated — each ⊥ has extra atom above slip -->
+      <text x="140" y="168" text-anchor="middle" font-size="9" fill="#888" font-family="Noto Sans KR">항복 후: 새 전위 대량 생성 → 자유롭게 이동</text>
+      <g transform="translate(20,178)">
+        <!-- Row 1 (above slip): 10 atoms — 7 normal + 3 extra at dislocation positions -->
+        <circle cx="15" cy="18" r="6" fill="#4aa3df"/>
+        <circle cx="40" cy="18" r="6" fill="#4aa3df"/>
+        <circle cx="58" cy="18" r="6" fill="#e74c3c" opacity="0.8"/>
+        <circle cx="75" cy="18" r="6" fill="#4aa3df"/>
+        <circle cx="100" cy="18" r="6" fill="#4aa3df"/>
+        <circle cx="125" cy="18" r="6" fill="#e74c3c" opacity="0.8"/>
+        <circle cx="145" cy="18" r="6" fill="#4aa3df"/>
+        <circle cx="170" cy="18" r="6" fill="#4aa3df"/>
+        <circle cx="188" cy="18" r="6" fill="#e74c3c" opacity="0.8"/>
+        <circle cx="210" cy="18" r="6" fill="#4aa3df"/>
+
+        <!-- Slip plane -->
+        <line x1="0" y1="34" x2="230" y2="34" stroke="#27ae60" stroke-width="1" stroke-dasharray="4,3"/>
+
+        <!-- ⊥ symbols at dislocation cores -->
+        <text x="58" y="32" text-anchor="middle" font-size="8" fill="#e74c3c" font-weight="700">⊥</text>
+        <text x="125" y="32" text-anchor="middle" font-size="8" fill="#e74c3c" font-weight="700">⊥</text>
+        <text x="188" y="32" text-anchor="middle" font-size="8" fill="#e74c3c" font-weight="700">⊥</text>
+
+        <!-- Row 2 (below slip): 7 atoms — gaps below each dislocation -->
+        <circle cx="15" cy="50" r="6" fill="#4aa3df"/>
+        <circle cx="40" cy="50" r="6" fill="#4aa3df"/>
+        <circle cx="75" cy="50" r="6" fill="#4aa3df"/>
+        <circle cx="100" cy="50" r="6" fill="#4aa3df"/>
+        <circle cx="145" cy="50" r="6" fill="#4aa3df"/>
+        <circle cx="170" cy="50" r="6" fill="#4aa3df"/>
+        <circle cx="210" cy="50" r="6" fill="#4aa3df"/>
+
+        <!-- Row 3 (below slip): 7 atoms -->
+        <circle cx="15" cy="72" r="6" fill="#4aa3df"/>
+        <circle cx="40" cy="72" r="6" fill="#4aa3df"/>
+        <circle cx="75" cy="72" r="6" fill="#4aa3df"/>
+        <circle cx="100" cy="72" r="6" fill="#4aa3df"/>
+        <circle cx="145" cy="72" r="6" fill="#4aa3df"/>
+        <circle cx="170" cy="72" r="6" fill="#4aa3df"/>
+        <circle cx="210" cy="72" r="6" fill="#4aa3df"/>
+
+        <!-- Movement arrows -->
+        <line x1="65" y1="28" x2="78" y2="28" stroke="#e74c3c" stroke-width="1.5" marker-end="url(#arrowRed)"/>
+        <line x1="132" y1="28" x2="145" y2="28" stroke="#e74c3c" stroke-width="1.5" marker-end="url(#arrowRed)"/>
+        <line x1="195" y1="28" x2="208" y2="28" stroke="#e74c3c" stroke-width="1.5" marker-end="url(#arrowRed)"/>
+
+        <text x="225" y="36" font-size="6" fill="#27ae60" font-family="Noto Sans KR">슬립면</text>
+      </g>
+    </svg>
+    <p class="dia-caption">위: 잉여 반면(빨강 열)이 위에서 슬립면까지 내려오고 끝남.<br>격자가 전위 코어 주변에서 뒤틀림. C 원자(노란색)가 고정.<br>아래: 항복 후 새 전위들이 슬립면을 따라 이동.</p>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ========== STAGE 3: PLASTIC ========== -->
+<div class="stage">
+  <div class="stage-text">
+    <div class="stage-number">03</div>
+    <div class="stage-title">소성 변형 (Plastic Deformation)</div>
+    <p>전위가 슬립면을 따라 이동하면서 원자면들이 한 격자 간격씩 미끄러진다. 이것이 <span class="key">소성 변형의 본질</span>이다.</p>
+    <p>핵심 통찰: 원자면 전체를 한꺼번에 밀 필요가 없다. <span class="key">전위 = 자벌레</span>처럼 한 줄의 원자만 순차적으로 이동시키면 되므로, 이론값보다 훨씬 작은 응력으로 변형이 가능하다.</p>
+    <p>금속 결합은 방향성이 없고(non-directional), 자유전자 바다가 원자들을 감싸고 있다. 따라서 원자가 새 위치로 이동해도 이웃과의 결합이 자연스럽게 재형성된다. 이것이 금속이 연성(ductile)인 근본 이유이다. (반면 세라믹은 방향성 공유결합이라 슬립 시 결합이 깨지면 복구가 어렵다 → 취성.)</p>
+    <p>BCC 철에서 슬립은 {110}, {112}, {123}면을 따라 ⟨111⟩ 방향으로 발생한다.</p>
+    <div class="analogy">무거운 양탄자를 방 한쪽에서 다른 쪽으로 밀려면 매우 힘들지만, 양탄자에 주름을 하나 만들어 그 주름만 밀면 쉽게 이동시킬 수 있다. 전위가 바로 그 '주름'이다.</div>
+  </div>
+  <div class="stage-diagram">
+    <svg viewBox="0 0 280 280" xmlns="http://www.w3.org/2000/svg">
+      <text x="140" y="20" text-anchor="middle" font-size="12" fill="#e67e22" font-weight="600" font-family="Noto Sans KR">전위의 이동 = 자벌레</text>
+
+      <!-- Step 1 -->
+      <text x="28" y="48" font-size="9" fill="#888" font-family="Noto Sans KR">Step 1</text>
+      <g transform="translate(8,55)">
+        <!-- Row 1 (above slip): 6 atoms — compressed near extra column at x=42 -->
+        <circle cx="0" cy="0" r="6" fill="#3498db" opacity="0.7"/>
+        <circle cx="24" cy="0" r="6" fill="#3498db" opacity="0.7"/>
+        <circle cx="42" cy="0" r="6" fill="#e74c3c" opacity="0.85"/>
+        <circle cx="58" cy="0" r="6" fill="#3498db" opacity="0.7"/>
+        <circle cx="82" cy="0" r="6" fill="#3498db" opacity="0.7"/>
+        <circle cx="106" cy="0" r="6" fill="#3498db" opacity="0.7"/>
+        <!-- Extra half-plane line -->
+        <line x1="42" y1="-8" x2="42" y2="16" stroke="#e74c3c" stroke-width="1" stroke-dasharray="2,2"/>
+        <!-- ⊥ at dislocation core -->
+        <text x="42" y="28" text-anchor="middle" font-size="10" fill="#e74c3c" font-weight="700">⊥</text>
+        <!-- Row 2 (below slip): 5 atoms — gap below extra column -->
+        <circle cx="0" cy="36" r="6" fill="#3498db" opacity="0.7"/>
+        <circle cx="24" cy="36" r="6" fill="#3498db" opacity="0.7"/>
+        <circle cx="54" cy="36" r="6" fill="#3498db" opacity="0.7"/>
+        <circle cx="78" cy="36" r="6" fill="#3498db" opacity="0.7"/>
+        <circle cx="102" cy="36" r="6" fill="#3498db" opacity="0.7"/>
+      </g>
+
+      <!-- Arrow -->
+      <text x="134" y="82" font-size="18" fill="#e67e22">→</text>
+
+      <!-- Step 2: dislocation moved one position to the right -->
+      <text x="160" y="48" font-size="9" fill="#888" font-family="Noto Sans KR">Step 2</text>
+      <g transform="translate(148,55)">
+        <!-- Row 1 (above slip): 6 atoms — compression now around x=64 -->
+        <circle cx="0" cy="0" r="6" fill="#3498db" opacity="0.7"/>
+        <circle cx="24" cy="0" r="6" fill="#3498db" opacity="0.7"/>
+        <circle cx="46" cy="0" r="6" fill="#3498db" opacity="0.7"/>
+        <circle cx="64" cy="0" r="6" fill="#e74c3c" opacity="0.85"/>
+        <circle cx="82" cy="0" r="6" fill="#3498db" opacity="0.7"/>
+        <circle cx="106" cy="0" r="6" fill="#3498db" opacity="0.7"/>
+        <!-- Extra half-plane line -->
+        <line x1="64" y1="-8" x2="64" y2="16" stroke="#e74c3c" stroke-width="1" stroke-dasharray="2,2"/>
+        <!-- ⊥ at dislocation core -->
+        <text x="64" y="28" text-anchor="middle" font-size="10" fill="#e74c3c" font-weight="700">⊥</text>
+        <!-- Row 2 (below slip): 5 atoms — gap shifted right (now below x=64) -->
+        <circle cx="0" cy="36" r="6" fill="#3498db" opacity="0.7"/>
+        <circle cx="24" cy="36" r="6" fill="#3498db" opacity="0.7"/>
+        <circle cx="48" cy="36" r="6" fill="#3498db" opacity="0.7"/>
+        <circle cx="78" cy="36" r="6" fill="#3498db" opacity="0.7"/>
+        <circle cx="102" cy="36" r="6" fill="#3498db" opacity="0.7"/>
+      </g>
+
+      <!-- Inchworm analogy -->
+      <g transform="translate(30,145)">
+        <text x="110" y="0" text-anchor="middle" font-size="10" fill="#888" font-family="Noto Sans KR">양탄자 비유: 주름을 밀면 전체가 이동</text>
+        <!-- Carpet -->
+        <rect x="10" y="30" width="200" height="8" fill="#ddd" rx="2"/>
+        <!-- Bump -->
+        <path d="M80,30 Q95,10 110,30" fill="#e67e22" opacity="0.6" stroke="#e67e22" stroke-width="1.5"/>
+        <line x1="95" y1="15" x2="115" y2="15" stroke="#e67e22" stroke-width="1.5" marker-end="url(#arrowOrange)"/>
+        <!-- Floor -->
+        <rect x="0" y="38" width="220" height="3" fill="#bbb"/>
+      </g>
+
+      <defs>
+        <marker id="arrowOrange" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto">
+          <path d="M0,0 L6,3 L0,6 Z" fill="#e67e22"/>
+        </marker>
+      </defs>
+
+      <!-- Result -->
+      <g transform="translate(20,205)">
+        <text x="120" y="0" text-anchor="middle" font-size="10" fill="#888" font-family="Noto Sans KR">결과: 윗면이 한 칸 이동 (영구 변형)</text>
+        <g transform="translate(20,12)">
+          <!-- Top row: shifted RIGHT by one atomic spacing (24) -->
+          <circle cx="24" cy="0" r="7" fill="#3498db" opacity="0.7"/>
+          <circle cx="48" cy="0" r="7" fill="#3498db" opacity="0.7"/>
+          <circle cx="72" cy="0" r="7" fill="#3498db" opacity="0.7"/>
+          <circle cx="96" cy="0" r="7" fill="#3498db" opacity="0.7"/>
+          <circle cx="120" cy="0" r="7" fill="#3498db" opacity="0.7"/>
+
+          <!-- Bottom row: original positions -->
+          <circle cx="0" cy="24" r="7" fill="#3498db" opacity="0.7"/>
+          <circle cx="24" cy="24" r="7" fill="#3498db" opacity="0.7"/>
+          <circle cx="48" cy="24" r="7" fill="#3498db" opacity="0.7"/>
+          <circle cx="72" cy="24" r="7" fill="#3498db" opacity="0.7"/>
+          <circle cx="96" cy="24" r="7" fill="#3498db" opacity="0.7"/>
+          <!-- Slip plane indicator -->
+          <line x1="-10" y1="12" x2="130" y2="12" stroke="#27ae60" stroke-width="1" stroke-dasharray="3,2"/>
+        </g>
+        <text x="175" y="30" font-size="9" fill="#27ae60" font-family="Noto Sans KR">← 한 칸 어긋남</text>
+      </g>
+    </svg>
+    <p class="dia-caption">윗줄에 원자 6개, 아랫줄에 5개 → 잉여 반면이 전위(⊥).<br>전위가 한 칸 이동하면, 결국 전체 윗면이 영구적으로 이동.</p>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ========== STAGE 4: STRAIN HARDENING ========== -->
+<div class="stage">
+  <div class="stage-text">
+    <div class="stage-number">04</div>
+    <div class="stage-title">변형 경화 (Strain Hardening)</div>
+    <p>변형이 진행되면 전위가 <span class="key">Frank-Read source에서 계속 증식</span>하여 전위 밀도가 급격히 증가한다.</p>
+    <p>전위끼리 만나면 서로의 응력장이 상호작용한다. 전위가 교차하면서 <span class="key">jog와 kink</span>가 형성되고, 이것이 추가적인 저항이 된다.</p>
+    <p>즉 <span class="key">"전위가 전위를 막는다"</span>. 변형을 계속하려면 점점 더 높은 응력이 필요 → 곡선이 우상향.</p>
+    <p>이 원리가 종이클립을 반복해서 구부리면 점점 더 힘들어지는 현상(가공경화)의 원인이다.</p>
+    <div class="analogy">사람이 적은 복도는 쉽게 지나갈 수 있지만, 사람이 가득 찬 복도는 이동하기 어렵다. 전위 밀도가 높아지면 같은 원리로 이동이 어려워진다.</div>
+  </div>
+  <div class="stage-diagram">
+    <svg viewBox="0 0 280 280" xmlns="http://www.w3.org/2000/svg">
+      <text x="140" y="20" text-anchor="middle" font-size="12" fill="#e67e22" font-weight="600" font-family="Noto Sans KR">전위 밀도 증가 → 서로 방해</text>
+
+      <!-- Low density -->
+      <text x="70" y="48" text-anchor="middle" font-size="10" fill="#888" font-family="Noto Sans KR">변형 초기</text>
+      <g transform="translate(10,55)">
+        <rect x="0" y="0" width="120" height="100" fill="none" stroke="#ddd" stroke-width="1" rx="4"/>
+        <!-- Few dislocations -->
+        <text x="30" y="35" font-size="14" fill="#e74c3c">⊥</text>
+        <text x="80" y="70" font-size="14" fill="#e74c3c">⊥</text>
+        <!-- Arrow showing easy movement -->
+        <line x1="45" y1="30" x2="70" y2="30" stroke="#27ae60" stroke-width="2" marker-end="url(#arrowGreen)"/>
+        <text x="60" y="20" text-anchor="middle" font-size="8" fill="#27ae60" font-family="Noto Sans KR">이동 쉬움</text>
+      </g>
+
+      <defs>
+        <marker id="arrowGreen" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto">
+          <path d="M0,0 L6,3 L0,6 Z" fill="#27ae60"/>
+        </marker>
+      </defs>
+
+      <!-- High density -->
+      <text x="210" y="48" text-anchor="middle" font-size="10" fill="#888" font-family="Noto Sans KR">변형 후기</text>
+      <g transform="translate(150,55)">
+        <rect x="0" y="0" width="120" height="100" fill="none" stroke="#ddd" stroke-width="1" rx="4"/>
+        <!-- Many dislocations - tangled -->
+        <text x="15" y="25" font-size="12" fill="#e74c3c">⊥</text>
+        <text x="45" y="25" font-size="12" fill="#e74c3c">⊥</text>
+        <text x="75" y="25" font-size="12" fill="#e74c3c">⊥</text>
+        <text x="100" y="25" font-size="12" fill="#e74c3c">⊥</text>
+        <text x="30" y="50" font-size="12" fill="#e74c3c">⊥</text>
+        <text x="60" y="52" font-size="12" fill="#e74c3c">⊥</text>
+        <text x="90" y="50" font-size="12" fill="#e74c3c">⊥</text>
+        <text x="15" y="75" font-size="12" fill="#e74c3c">⊥</text>
+        <text x="45" y="75" font-size="12" fill="#e74c3c">⊥</text>
+        <text x="75" y="75" font-size="12" fill="#e74c3c">⊥</text>
+        <text x="100" y="75" font-size="12" fill="#e74c3c">⊥</text>
+        <text x="30" y="95" font-size="12" fill="#e74c3c">⊥</text>
+        <text x="60" y="95" font-size="12" fill="#e74c3c">⊥</text>
+        <text x="90" y="95" font-size="12" fill="#e74c3c">⊥</text>
+        <!-- X mark showing blockage -->
+        <text x="60" y="40" font-size="16" fill="#c0392b" font-weight="700">✕</text>
+        <text x="60" y="68" text-anchor="middle" font-size="8" fill="#c0392b" font-family="Noto Sans KR">이동 어려움!</text>
+      </g>
+
+      <!-- Graph showing relationship -->
+      <g transform="translate(40,175)">
+        <text x="100" y="0" text-anchor="middle" font-size="10" fill="#888" font-family="Noto Sans KR">전위 밀도 vs 유동 응력</text>
+        <line x1="20" y1="80" x2="180" y2="80" stroke="#ccc" stroke-width="1"/>
+        <line x1="20" y1="80" x2="20" y2="15" stroke="#ccc" stroke-width="1"/>
+        <path d="M20,78 Q40,40 80,30 Q120,22 180,18" fill="none" stroke="#e67e22" stroke-width="2"/>
+        <text x="100" y="95" text-anchor="middle" font-size="8" fill="#888" font-family="Noto Sans KR">전위 밀도 (ρ) →</text>
+        <text x="8" y="50" text-anchor="middle" font-size="8" fill="#888" font-family="Noto Sans KR" transform="rotate(-90,8,50)">응력 (σ) →</text>
+        <text x="140" y="28" font-size="8" fill="#e67e22" font-family="Noto Sans KR">σ ∝ √ρ</text>
+      </g>
+    </svg>
+    <p class="dia-caption">전위(⊥)가 적으면 이동이 자유롭고,<br>많아지면 서로 엉켜 이동이 어려워진다.<br>응력은 전위 밀도의 제곱근에 비례.</p>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ========== STAGE 5: NECKING ========== -->
+<div class="stage">
+  <div class="stage-text">
+    <div class="stage-number">05</div>
+    <div class="stage-title">넥킹 (Necking)</div>
+    <p>UTS까지는 <span class="key">가공경화에 의한 강도 증가 > 단면적 감소에 의한 하중 지지력 감소</span>이므로 변형이 균일하게 일어난다. 어딘가 약간 얇아져도 경화가 보상해준다.</p>
+    <p>UTS 이후에는 가공경화율이 둔화되어 단면적 감소를 더 이상 보상하지 못한다. 약간 얇은 부분이 <span class="key">주변보다 약해지고</span>, 변형이 그곳에 집중되는 양의 되먹임(positive feedback)이 시작된다.</p>
+    <p>원자 수준에서: 넥킹 영역에서 전위 활동이 국부적으로 집중. 진응력(true stress)은 계속 증가하지만 공칭응력(engineering stress)은 초기 단면적 기준이므로 하락하는 것처럼 보인다.</p>
+    <div class="analogy">풍선을 늘릴 때, 한쪽이 더 늘어나기 시작하면 그 부분에 힘이 집중되어 점점 더 얇아지는 것과 같다.</div>
+  </div>
+  <div class="stage-diagram">
+    <svg viewBox="0 0 280 280" xmlns="http://www.w3.org/2000/svg">
+      <text x="140" y="20" text-anchor="middle" font-size="12" fill="#c0392b" font-weight="600" font-family="Noto Sans KR">국부 변형 집중</text>
+
+      <!-- Before necking: uniform -->
+      <text x="140" y="48" text-anchor="middle" font-size="10" fill="#888" font-family="Noto Sans KR">UTS 이전: 균일한 변형</text>
+      <g transform="translate(40,58)">
+        <rect x="0" y="10" width="200" height="40" fill="#3498db" opacity="0.3" rx="4"/>
+        <rect x="0" y="10" width="200" height="40" fill="none" stroke="#3498db" stroke-width="2" rx="4"/>
+        <!-- Arrows -->
+        <line x1="-15" y1="30" x2="-25" y2="30" stroke="#555" stroke-width="2" marker-end="url(#arrowDark)"/>
+        <line x1="215" y1="30" x2="225" y2="30" stroke="#555" stroke-width="2" marker-end="url(#arrowDark)"/>
+        <!-- Distributed dislocations -->
+        <text x="30" y="35" font-size="10" fill="#e74c3c">⊥ ⊥ ⊥</text>
+        <text x="100" y="35" font-size="10" fill="#e74c3c">⊥ ⊥ ⊥</text>
+        <text x="165" y="35" font-size="10" fill="#e74c3c">⊥ ⊥</text>
+      </g>
+
+      <defs>
+        <marker id="arrowDark" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto">
+          <path d="M0,0 L6,3 L0,6 Z" fill="#555"/>
+        </marker>
+      </defs>
+
+      <!-- After necking: connected specimen with narrow neck -->
+      <text x="140" y="130" text-anchor="middle" font-size="10" fill="#888" font-family="Noto Sans KR">UTS 이후: 넥킹 발생</text>
+      <g transform="translate(40,140)">
+        <!-- Single connected necked shape -->
+        <path d="M0,10 L65,10 Q85,10 95,17 Q105,24 100,30 Q105,36 95,43 Q85,50 65,50 L0,50 Z" fill="#3498db" opacity="0.3"/>
+        <path d="M200,10 L135,10 Q115,10 105,17 Q95,24 100,30 Q95,36 105,43 Q115,50 135,50 L200,50 Z" fill="#3498db" opacity="0.3"/>
+        <path d="M0,10 L65,10 Q85,10 95,17 Q105,24 100,30 Q105,36 95,43 Q85,50 65,50 L0,50" fill="none" stroke="#3498db" stroke-width="2"/>
+        <path d="M200,10 L135,10 Q115,10 105,17 Q95,24 100,30 Q95,36 105,43 Q115,50 135,50 L200,50" fill="none" stroke="#3498db" stroke-width="2"/>
+        <!-- Arrows -->
+        <line x1="-15" y1="30" x2="-25" y2="30" stroke="#555" stroke-width="2" marker-end="url(#arrowDark)"/>
+        <line x1="215" y1="30" x2="225" y2="30" stroke="#555" stroke-width="2" marker-end="url(#arrowDark)"/>
+        <!-- Concentrated dislocations IN the neck -->
+        <text x="92" y="28" font-size="7" fill="#e74c3c">⊥⊥</text>
+        <text x="92" y="37" font-size="7" fill="#e74c3c">⊥⊥</text>
+
+        <!-- Neck indicator -->
+        <line x1="100" y1="55" x2="100" y2="65" stroke="#c0392b" stroke-width="1.5"/>
+        <text x="100" y="74" text-anchor="middle" font-size="9" fill="#c0392b" font-family="Noto Sans KR">넥</text>
+      </g>
+
+      <!-- Balance diagram -->
+      <g transform="translate(30,240)">
+        <text x="110" y="0" text-anchor="middle" font-size="9" fill="#888" font-family="Noto Sans KR">UTS 전후의 균형 변화</text>
+        <text x="30" y="20" text-anchor="middle" font-size="8" fill="#27ae60" font-family="Noto Sans KR">경화 효과 > 면적 감소</text>
+        <text x="30" y="30" text-anchor="middle" font-size="8" fill="#27ae60" font-family="Noto Sans KR">→ 균일 변형 (안정)</text>
+        <text x="110" y="20" text-anchor="middle" font-size="12" fill="#888">│</text>
+        <text x="110" y="14" text-anchor="middle" font-size="8" fill="#e67e22" font-family="Noto Sans KR">UTS</text>
+        <text x="190" y="20" text-anchor="middle" font-size="8" fill="#c0392b" font-family="Noto Sans KR">경화 효과 < 면적 감소</text>
+        <text x="190" y="30" text-anchor="middle" font-size="8" fill="#c0392b" font-family="Noto Sans KR">→ 국부 변형 (넥킹)</text>
+      </g>
+    </svg>
+    <p class="dia-caption">UTS 이전에는 변형이 균일하지만,<br>이후에는 한 곳에 집중되어 목이 형성된다.</p>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ========== STAGE 6: FRACTURE ========== -->
+<div class="stage">
+  <div class="stage-text">
+    <div class="stage-number">06</div>
+    <div class="stage-title">파단 (Fracture)</div>
+    <p>넥킹 영역에서 극심한 소성 변형이 일어나면, 개재물(inclusion)이나 제2상 입자 주변에서 원자 결합이 분리되면서 <span class="key">미세공동(microvoid)</span>이 생성된다.</p>
+    <p>공동들이 성장하고 이웃 공동과 합체(coalescence)하면서 내부 균열이 형성되고, 최종적으로 재료가 분리된다.</p>
+    <p>Mild steel에서는 중심부의 인장 균열 + 가장자리의 45° 전단 파괴가 결합된 <span class="key">Cup-and-Cone 파단면</span>이 특징적이다.</p>
+    <div class="analogy">치즈를 잡아당기면 내부에 구멍들이 생기고, 구멍들이 커지다가 연결되면서 끊어지는 것과 비슷하다.</div>
+  </div>
+  <div class="stage-diagram">
+    <svg viewBox="0 0 280 300" xmlns="http://www.w3.org/2000/svg">
+      <text x="140" y="20" text-anchor="middle" font-size="12" fill="#c0392b" font-weight="600" font-family="Noto Sans KR">미세공동 → 합체 → 파단</text>
+
+      <!-- Step 1: Void nucleation -->
+      <text x="70" y="48" text-anchor="middle" font-size="9" fill="#888" font-family="Noto Sans KR">① 공동 핵생성</text>
+      <g transform="translate(20,55)">
+        <rect x="0" y="0" width="100" height="60" fill="#3498db" opacity="0.2" rx="4"/>
+        <!-- Inclusions with voids -->
+        <rect x="25" y="18" width="8" height="8" fill="#555" rx="1"/>
+        <circle cx="29" cy="15" r="4" fill="white" stroke="#c0392b" stroke-width="1"/>
+        <rect x="60" y="30" width="8" height="8" fill="#555" rx="1"/>
+        <circle cx="64" cy="27" r="4" fill="white" stroke="#c0392b" stroke-width="1"/>
+        <rect x="45" y="45" width="6" height="6" fill="#555" rx="1"/>
+        <circle cx="48" cy="42" r="3" fill="white" stroke="#c0392b" stroke-width="1"/>
+        <!-- Labels -->
+        <text x="85" y="15" font-size="7" fill="#555" font-family="Noto Sans KR">공동</text>
+        <line x1="78" y1="14" x2="34" y2="14" stroke="#555" stroke-width="0.5"/>
+        <text x="85" y="48" font-size="7" fill="#555" font-family="Noto Sans KR">개재물</text>
+      </g>
+
+      <!-- Step 2: Void growth -->
+      <text x="210" y="48" text-anchor="middle" font-size="9" fill="#888" font-family="Noto Sans KR">② 공동 성장</text>
+      <g transform="translate(160,55)">
+        <rect x="0" y="0" width="100" height="60" fill="#3498db" opacity="0.2" rx="4"/>
+        <rect x="25" y="20" width="8" height="8" fill="#555" rx="1"/>
+        <circle cx="29" cy="13" r="8" fill="white" stroke="#c0392b" stroke-width="1"/>
+        <rect x="58" y="32" width="8" height="8" fill="#555" rx="1"/>
+        <circle cx="62" cy="25" r="9" fill="white" stroke="#c0392b" stroke-width="1"/>
+        <rect x="43" y="48" width="6" height="6" fill="#555" rx="1"/>
+        <circle cx="46" cy="42" r="6" fill="white" stroke="#c0392b" stroke-width="1"/>
+      </g>
+
+      <!-- Step 3: Coalescence -->
+      <text x="70" y="138" text-anchor="middle" font-size="9" fill="#888" font-family="Noto Sans KR">③ 합체</text>
+      <g transform="translate(20,145)">
+        <rect x="0" y="0" width="100" height="60" fill="#3498db" opacity="0.2" rx="4"/>
+        <!-- Merged voids forming crack -->
+        <path d="M20,15 Q30,5 40,15 Q50,5 65,15 Q75,5 80,20 Q85,35 75,45 Q65,55 50,45 Q35,55 25,45 Q15,35 20,15 Z" fill="white" stroke="#c0392b" stroke-width="1.5"/>
+        <text x="50" y="32" text-anchor="middle" font-size="7" fill="#c0392b" font-family="Noto Sans KR">내부 균열</text>
+      </g>
+
+      <!-- Step 4: Cup and cone -->
+      <text x="210" y="138" text-anchor="middle" font-size="9" fill="#888" font-family="Noto Sans KR">④ Cup-and-Cone 파단</text>
+      <g transform="translate(160,145)">
+        <!-- Left piece: CUP (concave right face) -->
+        <path d="M10,10 L10,55 L55,55 L55,42 Q45,30 55,18 L55,10 Z" fill="#3498db" opacity="0.3" stroke="#3498db" stroke-width="1.5"/>
+        <!-- Right piece: CONE (convex left face) -->
+        <path d="M62,10 L62,18 Q72,30 62,42 L62,55 L100,55 L100,10 Z" fill="#3498db" opacity="0.3" stroke="#3498db" stroke-width="1.5"/>
+        <!-- Gap -->
+        <text x="58" y="34" text-anchor="middle" font-size="6" fill="#c0392b">↔</text>
+        <!-- 45 degree labels -->
+        <text x="50" y="52" font-size="7" fill="#888" font-family="Noto Sans KR">45°</text>
+      </g>
+
+      <!-- Bottom summary -->
+      <g transform="translate(20,230)">
+        <rect x="0" y="0" width="240" height="50" fill="#fff3f3" rx="6" stroke="#e74c3c" stroke-width="1"/>
+        <text x="120" y="18" text-anchor="middle" font-size="9" fill="#c0392b" font-weight="600" font-family="Noto Sans KR">연성 파단의 순서</text>
+        <text x="120" y="38" text-anchor="middle" font-size="9" fill="#555" font-family="Noto Sans KR">공동 핵생성 → 성장 → 합체 → 최종 분리</text>
+      </g>
+    </svg>
+    <p class="dia-caption">개재물 주변에서 공동이 생기고 자라서<br>합쳐지면 균열이 되고, 최종적으로 파단.</p>
+  </div>
+</div>
+
+<!-- ========== SUMMARY ========== -->
+<div class="summary">
+  <h2>정리: 하나의 원자 이야기</h2>
+  <div class="flow-row">
+    <div class="flow-item">
+      <div class="fi-title">① 탄성</div>
+      <div class="fi-desc">결합이 늘어남<br>(복원 가능)</div>
+    </div>
+    <div class="arrow-between">→</div>
+    <div class="flow-item">
+      <div class="fi-title">② 항복</div>
+      <div class="fi-desc">전위가 고정점에서<br>풀려남 + 증식</div>
+    </div>
+    <div class="arrow-between">→</div>
+    <div class="flow-item">
+      <div class="fi-title">③ 소성</div>
+      <div class="fi-desc">전위가 슬립면을<br>따라 이동</div>
+    </div>
+    <div class="arrow-between">→</div>
+    <div class="flow-item">
+      <div class="fi-title">④ 경화</div>
+      <div class="fi-desc">전위끼리 엉켜서<br>서로 방해</div>
+    </div>
+    <div class="arrow-between">→</div>
+    <div class="flow-item">
+      <div class="fi-title">⑤ 넥킹</div>
+      <div class="fi-desc">국부적 변형 집중<br>(경화 효과 한계)</div>
+    </div>
+    <div class="arrow-between">→</div>
+    <div class="flow-item">
+      <div class="fi-title">⑥ 파단</div>
+      <div class="fi-desc">공동 합체로<br>결합 완전 분리</div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <p>Mild Steel 응력-변형률 곡선 — 원자 관점 교육자료</p>
+</footer>
+
+</div>
+</body>
+</html>
