@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>열탄성학 — 원자 관점에서의 이해</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded",function(){
+  function tryRender(){
+    if(typeof renderMathInElement==='function'){
+      renderMathInElement(document.body,{
+        delimiters:[
+          {left:'$$',right:'$$',display:true},
+          {left:'$',right:'$',display:false}
+        ],
+        ignoredTags:['script','noscript','style','textarea','pre','code'],
+        throwOnError:false
+      });
+    } else {
+      setTimeout(tryRender,50);
+    }
+  }
+  tryRender();
+});
+</script>
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#FAFAF7;--sf:#FFF;--tx:#1A1A1A;--t2:#5A5A5A;--ac:#D94F30;--wm:#E8732C;--bl:#2E6B9E;--gn:#3A8C5C;--bd:#E5E2DC;--sh:rgba(0,0,0,.06)}
+body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--tx);line-height:1.7;overflow-x:hidden}
+.hero{padding:70px 40px 50px;text-align:center}
+.hero h1{font-family:'Playfair Display',serif;font-weight:900;font-size:clamp(2rem,5vw,3.4rem);letter-spacing:-1px;margin-bottom:8px}
+.hero h1 span{color:var(--ac)}
+.hero .sub{font-size:.95rem;color:var(--t2);font-weight:300;max-width:580px;margin:0 auto}
+.container{max-width:1200px;margin:0 auto;padding:0 24px}
+.sec{margin-bottom:56px}
+.sec-label{display:inline-block;font-size:.65rem;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--ac);margin-bottom:5px}
+.sec h2{font-size:1.4rem;font-weight:700;margin-bottom:8px}
+.sec p.desc{color:var(--t2);font-weight:300;font-size:.9rem;max-width:700px;margin-bottom:20px}
+.card{background:var(--sf);border:1px solid var(--bd);border-radius:14px;padding:24px;box-shadow:0 2px 12px var(--sh)}
+.g22{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:24px}
+@media(max-width:700px){.g22{grid-template-columns:1fr}}
+.sg{display:grid;grid-template-columns:1fr 280px;gap:20px;align-items:start}
+@media(max-width:860px){.sg{grid-template-columns:1fr}}
+.cw{position:relative;background:#F5F4F0;border-radius:10px;overflow:hidden;aspect-ratio:4/3;border:1px solid var(--bd)}
+.cw canvas{width:100%;height:100%;display:block}
+.ctl{display:flex;flex-direction:column;gap:14px}
+.cg label{display:block;font-size:.72rem;font-weight:500;color:var(--t2);letter-spacing:1px;text-transform:uppercase;margin-bottom:3px}
+.cg .vd{font-size:1.2rem;font-weight:700;margin-bottom:2px}
+.cg input[type=range]{-webkit-appearance:none;width:100%;height:5px;border-radius:3px;background:var(--bd);outline:none}
+.cg input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;border-radius:50%;background:var(--ac);cursor:grab;box-shadow:0 2px 6px rgba(217,79,48,.3)}
+.tr{display:flex;gap:5px;flex-wrap:wrap}
+.tb{padding:5px 11px;border-radius:7px;border:1.5px solid var(--bd);background:transparent;font-family:inherit;font-size:.78rem;font-weight:500;cursor:pointer;transition:all .2s;color:var(--t2)}
+.tb.active{border-color:var(--ac);background:rgba(217,79,48,.06);color:var(--ac)}
+.tb:hover{border-color:var(--ac)}
+.ib{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-top:14px}
+.ii{background:#F5F4F0;border-radius:8px;padding:10px 12px;border:1px solid var(--bd)}
+.ii .lb{font-size:.65rem;font-weight:500;color:var(--t2);letter-spacing:1px;text-transform:uppercase}
+.ii .vl{font-size:1.1rem;font-weight:700;margin-top:1px}
+.vl.sv{color:var(--ac)}.vl.ev{color:var(--bl)}.vl.tv{color:var(--wm)}
+.ec{background:var(--sf);border:1px solid var(--bd);border-radius:12px;padding:20px;box-shadow:0 1px 6px var(--sh);position:relative;overflow:visible;overflow-x:auto}
+.ec::before{content:'';position:absolute;top:0;left:0;width:4px;height:100%}
+.ec.t::before{background:var(--wm)}.ec.s::before{background:var(--bl)}.ec.x::before{background:var(--ac)}.ec.c::before{background:var(--gn)}
+.ec h3{font-size:.95rem;font-weight:700;margin-bottom:5px}
+.ec p{font-size:.82rem;color:var(--t2);font-weight:300;line-height:1.6}
+.eq-box{background:#F5F4F0;border:1px solid var(--bd);border-radius:8px;padding:14px 16px;margin-top:14px;text-align:center;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.eq-box .eq{font-size:.95rem}.eq-box .ed{font-size:.75rem;color:var(--t2);margin-top:4px}
+.ec .eq-box{padding:8px 10px}.ec .eq-box .eq{font-size:.82rem}
+.katex-display{margin:0 !important;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;padding:2px 0}
+.katex-display>.katex{white-space:nowrap}
+.katex{font-size:1em !important}
+@media(max-width:700px){.eq-box .eq{font-size:.82rem}.ec .eq-box .eq{font-size:.75rem}.katex{font-size:.92em !important}}
+footer{text-align:center;padding:30px 20px;color:var(--t2);font-size:.72rem;border-top:1px solid var(--bd);margin-top:30px}
+.pw,.fw{background:#F5F4F0;border-radius:10px;border:1px solid var(--bd);overflow:hidden;aspect-ratio:5/3}
+.pw canvas,.fw canvas{width:100%;height:100%;display:block}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start}
+@media(max-width:860px){.two-col{grid-template-columns:1fr}}
+.dw{background:#F5F4F0;border-radius:10px;border:1px solid var(--bd);overflow:hidden;aspect-ratio:3/1}
+.dw canvas{width:100%;height:100%;display:block}
+.mc{background:#F5F4F0;border-radius:10px;overflow:hidden;border:1px solid var(--bd);aspect-ratio:1/1}
+.mc canvas{width:100%;height:100%;display:block}
+.mg{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:860px){.mg{grid-template-columns:1fr}}
+.ml{display:flex;flex-direction:column;gap:10px}
+.mt{display:inline-block;padding:3px 9px;border-radius:6px;font-size:.68rem;font-weight:700;letter-spacing:1px}
+.mt.mo{background:rgba(217,79,48,.1);color:var(--ac)}
+.mt.ha{background:rgba(46,107,158,.1);color:var(--bl)}
+.mir{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.mch{background:#F5F4F0;border-radius:10px;border:1px solid var(--bd);overflow:hidden;height:150px}
+.mch canvas{width:100%;height:100%;display:block}
+</style>
+</head>
+<body>
+<div class="hero">
+  <h1>Thermo<span>elasticity</span></h1>
+  <p class="sub">온도 · 변형 · 응력 — 원자 관점에서 바라본 열탄성학의 기본 원리</p>
+</div>
+<div class="container">
+
+<!-- 1. 개념 -->
+<div class="sec">
+  <span class="sec-label">개념 소개</span>
+  <h2>왜 온도가 변하면 응력이 생길까?</h2>
+  <p class="desc">고체 내부의 원자들은 결합으로 연결되어 평형 거리를 유지합니다. 온도가 올라가면 열진동이 커지며, 비대칭 퍼텐셜로 인해 평균 원자 간 거리가 늘어납니다. 이것이 열팽창이고, 팽창이 구속되면 열응력이 발생합니다.</p>
+  <div class="g22">
+    <div class="ec t">
+      <h3>🔥 온도 (Temperature)</h3>
+      <p>거시적 온도는 원자 운동에너지의 통계적 평균입니다. 3차원에서 등분배 정리에 의해,</p>
+      <div class="eq-box"><div class="eq">$$\frac{1}{2}m\langle v^2\rangle = \frac{3}{2}k_B T$$</div>
+        <div class="ed">$\langle v^2\rangle = \langle v_x^2\rangle+\langle v_y^2\rangle+\langle v_z^2\rangle$</div></div>
+      <p style="margin-top:6px;font-size:.78rem">고전적 극한($T \gg \Theta_D$)에서 성립. 극저온 양자 영역에서는 보정 필요.</p>
+    </div>
+    <div class="ec s">
+      <h3>↔️ 변형률 (Strain)</h3>
+      <p>원자 간 평균 거리의 상대적 변화.</p>
+      <div class="eq-box"><div class="eq">$$\varepsilon_{\text{thermal}} = \alpha\,\Delta T$$</div>
+        <div class="ed">$\alpha$: 선형 열팽창계수</div></div>
+    </div>
+    <div class="ec x">
+      <h3>⚡ 응력 (Stress) — Virial 정의</h3>
+      <div class="eq-box"><div class="eq">$$\sigma_{ij}=\frac{1}{\Omega}\sum_\alpha\!\Bigl[-m^\alpha v_i^\alpha v_j^\alpha + \frac{1}{2}\sum_{\beta\neq\alpha} r_i^{\alpha\beta}f_j^{\alpha\beta}\Bigr]$$</div></div>
+      <p style="margin-top:6px">자유 팽창: 두 항 균형 → $\sigma=0$. 구속: 불균형 → 열응력.</p>
+    </div>
+    <div class="ec c">
+      <h3>🔗 열-역학 커플링</h3>
+      <div class="eq-box"><div class="eq">$$\sigma = E\bigl(\varepsilon_{\text{total}} - \alpha\,\Delta T\bigr)$$</div>
+        <div class="ed">$E$: 영률 (탄성계수)</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- 2. 퍼텐셜 & 힘 -->
+<div class="sec">
+  <span class="sec-label">퍼텐셜 에너지와 원자 간 힘</span>
+  <h2>$F(r)=-dV/dr$ : 퍼텐셜의 형태가 힘을 결정한다</h2>
+  <p class="desc">퍼텐셜 에너지를 거리로 미분하면 원자 간 힘을 얻습니다. 비대칭 퍼텐셜에서는 압축 방향 척력이 인장 방향 인력보다 급격히 크므로, 열진동의 평균 위치가 바깥으로 이동합니다. 대칭 퍼텐셜에서는 양방향 힘이 동일하여 평균 위치가 변하지 않습니다.</p>
+  <div class="eq-box" style="margin-bottom:18px">
+    <div class="eq">$$V_{\text{Morse}}=D_e\bigl[1-e^{-a(r-r_0)}\bigr]^2-D_e \qquad V_{\text{Harm}}=\tfrac{1}{2}k(r-r_0)^2-D_e \quad (k=2D_ea^2)$$</div>
+    <div class="ed">$F=-dV/dr$. 동일한 평형 거리 $r_0$, 동일한 평형 근처 곡률로 공정 비교</div>
+  </div>
+
+  <p style="font-size:.72rem;font-weight:700;color:var(--ac);letter-spacing:1px;margin-bottom:4px">MORSE (비대칭)</p>
+  <div class="two-col">
+    <div><div class="pw"><canvas id="potentialCanvas"></canvas></div><p style="text-align:center;font-size:.75rem;color:var(--t2);margin-top:5px">퍼텐셜 에너지 $V(r)$ — Morse</p></div>
+    <div><div class="fw"><canvas id="forceCanvas"></canvas></div><p style="text-align:center;font-size:.75rem;color:var(--t2);margin-top:5px">원자 간 힘 $F(r)$ — Morse</p></div>
+  </div>
+
+  <p style="font-size:.72rem;font-weight:700;color:var(--bl);letter-spacing:1px;margin:20px 0 4px">HARMONIC (대칭)</p>
+  <div class="two-col">
+    <div><div class="pw"><canvas id="harmPotCanvas"></canvas></div><p style="text-align:center;font-size:.75rem;color:var(--t2);margin-top:5px">퍼텐셜 에너지 $V(r)$ — Harmonic</p></div>
+    <div><div class="fw"><canvas id="harmForceCanvas"></canvas></div><p style="text-align:center;font-size:.75rem;color:var(--t2);margin-top:5px">원자 간 힘 $F(r)$ — Harmonic</p></div>
+  </div>
+
+  <div class="two-col" style="margin-top:16px">
+    <div class="ctl"><div class="cg"><label>에너지 준위 (온도 비례)</label><div class="vd" id="energyDisplay">낮음</div><input type="range" id="energySlider" min="0" max="100" value="20"></div></div>
+    <div class="ec t" style="margin:0"><h3>비교 포인트</h3><p><strong>Morse</strong>: 에너지 준위가 올라가면 평균 위치 $\bar{r}$가 $r_0$보다 오른쪽으로 이동 → 열팽창. <strong>Harmonic</strong>: 대칭이므로 평균 위치가 항상 $r_0$에 머뭄 → 열팽창 없음.</p></div>
+  </div>
+</div>
+
+<!-- 2.5. 2원자 -->
+<div class="sec">
+  <span class="sec-label">2원자 모델</span>
+  <h2>온도에 따른 원자 간 거리 변화</h2>
+  <p class="desc">비대칭(Morse) 퍼텐셜에서는 $\bar{r} > r_0$로 열팽창이 발생하지만, 대칭(Harmonic) 퍼텐셜에서는 $\bar{r} = r_0$으로 열팽창이 없습니다.</p>
+  <div class="ctl" style="margin-bottom:12px">
+    <div class="cg"><label>온도 $T$</label><div class="vd" id="diatomTempDisplay">0 K</div><input type="range" id="diatomTempSlider" min="0" max="100" value="0"></div>
+  </div>
+  <div class="two-col">
+    <div>
+      <p style="font-size:.72rem;font-weight:700;color:var(--ac);letter-spacing:1px;margin-bottom:4px">MORSE (비대칭)</p>
+      <div class="dw"><canvas id="diatomMorseCanvas"></canvas></div>
+      <div class="ii" style="margin-top:8px"><div class="lb">평균 거리 변화</div><div class="vl sv" id="diatomMorseStretch">Δr / r₀ = 0 %</div></div>
+    </div>
+    <div>
+      <p style="font-size:.72rem;font-weight:700;color:var(--bl);letter-spacing:1px;margin-bottom:4px">HARMONIC (대칭)</p>
+      <div class="dw"><canvas id="diatomHarmCanvas"></canvas></div>
+      <div class="ii" style="margin-top:8px"><div class="lb">평균 거리 변화</div><div class="vl ev" id="diatomHarmStretch">Δr / r₀ = 0 %</div></div>
+    </div>
+  </div>
+</div>
+
+
+<!-- 3.5. MD -->
+<div class="sec">
+  <span class="sec-label">분자동역학 시뮬레이션</span>
+  <h2>비선형 스프링 격자 — 열팽창의 직접적 검증</h2>
+  <p class="desc">4×4 unit cell 격자 (각 unit cell: 4원자 + 6스프링 — edge 4개 + diagonal 2개). Velocity Verlet 적분 + Berendsen thermostat. 온도를 <strong>천천히</strong> 올려보세요.</p>
+  <div class="eq-box" style="margin-bottom:14px">
+    <div class="eq">$$F_{\text{비대칭}}(r) = -2D_e\,a\,e^{-a(r-r_0)}\bigl[1-e^{-a(r-r_0)}\bigr] \qquad F_{\text{대칭}}(r) = -k\,(r-r_0)$$</div>
+    <div class="ed">비대칭: 앞에서 학습한 Morse 힘을 그대로 사용. 대칭: 동일 곡률($k=2D_e a^2$)의 선형 스프링</div>
+  </div>
+  <div class="card">
+    <div class="ctl" style="margin-bottom:14px">
+      <div class="cg"><label>목표 온도 $T^*$</label><div class="vd" id="mdTempDisplay">0.000</div><input type="range" id="mdTempSlider" min="0" max="100" value="0"></div>
+      <div class="tr"><button class="tb" id="mdRunBtn">▶ 시작</button><button class="tb" id="mdResetBtn">↺ 초기화</button><button class="tb" id="mdTrailBtn">궤적</button></div>
+    </div>
+    <div class="mg">
+      <div class="ml">
+        <span class="mt mo">MORSE 스프링 (비대칭)</span>
+        <div class="mc"><canvas id="mdMorseCanvas"></canvas></div>
+        <div class="mir"><div class="ii"><div class="lb">격자 상수</div><div class="vl sv" id="mdML">1.000</div></div><div class="ii"><div class="lb">팽창률</div><div class="vl sv" id="mdME">0.00 %</div></div></div>
+        <div class="mir"><div class="ii"><div class="lb">측정 $T$</div><div class="vl tv" id="mdMT">0.000</div></div><div class="ii"><div class="lb">에너지/N</div><div class="vl" id="mdMEn">0.000</div></div></div>
+        <p style="font-size:.72rem;color:var(--t2);margin:4px 0 2px;font-weight:500">▼ 평균 격자 상수 ⟨a⟩ 시간 이력 (점선 = r₀)</p>
+        <div class="mch"><canvas id="mdMorseChart"></canvas></div>
+      </div>
+      <div class="ml">
+        <span class="mt ha">HARMONIC 스프링 (대칭)</span>
+        <div class="mc"><canvas id="mdHarmonicCanvas"></canvas></div>
+        <div class="mir"><div class="ii"><div class="lb">격자 상수</div><div class="vl ev" id="mdHL">1.000</div></div><div class="ii"><div class="lb">팽창률</div><div class="vl ev" id="mdHE">0.00 %</div></div></div>
+        <div class="mir"><div class="ii"><div class="lb">측정 $T$</div><div class="vl tv" id="mdHT">0.000</div></div><div class="ii"><div class="lb">에너지/N</div><div class="vl" id="mdHEn">0.000</div></div></div>
+        <p style="font-size:.72rem;color:var(--t2);margin:4px 0 2px;font-weight:500">▼ 평균 격자 상수 ⟨a⟩ 시간 이력 (점선 = r₀)</p>
+        <div class="mch"><canvas id="mdHarmonicChart"></canvas></div>
+      </div>
+    </div>
+    <div class="g22" style="margin-top:16px">
+      <div class="ec x"><h3>비대칭 스프링 (Morse)</h3><p>온도 ↑ → 격자 <strong>팽창</strong>. 앞에서 배운 Morse 퍼텐셜을 직접 적용. 비대칭으로 인해 평균 결합 길이 &gt; $r_0$. 차트에서 ⟨a⟩가 $r_0$ 위로 상승.</p></div>
+      <div class="ec s"><h3>대칭 스프링 (Harmonic)</h3><p>온도 ↑ → 격자 <strong>불변</strong>. 동일 곡률의 선형 스프링. 양방향 대칭 → 평균 항상 $r_0$. 차트에서 ⟨a⟩가 $r_0$ 근처 유지.</p></div>
+    </div>
+  </div>
+</div>
+
+
+<!-- 5. 격자 (마지막으로 이동) -->
+<!-- 3. 격자 -->
+<div class="sec">
+  <span class="sec-label">2D 원자 격자 — 거시적 모델</span>
+  <h2>온도 변화에 따른 격자의 반응</h2>
+  <p class="desc">앞의 분자동역학에서 확인한 원리를 거시적으로 적용한 모델입니다. 경계 조건을 전환하여 열팽창과 열응력의 차이를 확인하세요.</p>
+  <div class="card">
+    <div class="sg">
+      <div class="cw"><canvas id="latticeCanvas"></canvas></div>
+      <div class="ctl">
+        <div class="cg"><label>$\Delta T$</label><div class="vd" id="tempDisplay">0 K</div><input type="range" id="tempSlider" min="0" max="100" value="0"></div>
+        <div class="cg"><label>경계 조건</label><div class="tr"><button class="tb active" data-bc="free">자유 팽창</button><button class="tb" data-bc="fixed">완전 구속</button><button class="tb" data-bc="uniaxial">X축 구속</button></div></div>
+        <div class="cg"><label>시각화</label><div class="tr"><button class="tb active" data-vis="vibration">열진동</button><button class="tb active" data-vis="bonds">결합</button></div></div>
+        <div class="cg"><label>$\alpha$ (× 10⁻⁶ /K)</label><div class="vd" id="alphaDisplay">12</div><input type="range" id="alphaSlider" min="0" max="25" value="12"></div>
+      </div>
+    </div>
+    <div class="ib">
+      <div class="ii"><div class="lb">$\varepsilon$</div><div class="vl ev" id="strainVal">0.000 %</div></div>
+      <div class="ii"><div class="lb">$\alpha\Delta T$</div><div class="vl tv" id="thermalStrainVal">0.000 %</div></div>
+      <div class="ii"><div class="lb">$\varepsilon_{\text{el}}$</div><div class="vl ev" id="elasticStrainVal">0.000 %</div></div>
+      <div class="ii"><div class="lb">$\sigma$</div><div class="vl sv" id="stressVal">0.0 MPa</div></div>
+    </div>
+  </div>
+</div>
+
+</div>
+<footer>기계공학과 재료역학 · 열탄성학(Thermoelasticity) 기본 개념 교육 자료</footer>
+
+<script>
+function lerp(a,b,t){return a+(b-a)*t}
+function tempColor(f){return`rgb(${Math.round(lerp(46,230,f))},${Math.round(lerp(107,80,f))},${Math.round(lerp(158,40,f))})`}
+
+// ===== POTENTIAL + FORCE =====
+;(function(){
+const pC=document.getElementById('potentialCanvas'),pX=pC.getContext('2d');
+const fC=document.getElementById('forceCanvas'),fX=fC.getContext('2d');
+const hpC=document.getElementById('harmPotCanvas'),hpX=hpC.getContext('2d');
+const hfC=document.getElementById('harmForceCanvas'),hfX=hfC.getContext('2d');
+const sl=document.getElementById('energySlider'),dp=document.getElementById('energyDisplay');
+function rsz(){[pC,fC,hpC,hfC].forEach(c=>{const r=c.parentElement.getBoundingClientRect();c.width=r.width*2;c.height=r.height*2})}
+rsz();window.addEventListener('resize',()=>{rsz();requestAnimationFrame(draw)});
+const D=1,a=1.8,r0=1;
+const kH=2*D*a*a; // harmonic spring constant matched to Morse curvature
+function V(r){const e=Math.exp(-a*(r-r0));return D*(1-e)*(1-e)-D}
+function F(r){const e=Math.exp(-a*(r-r0));return -2*D*a*e*(1-e)}
+function Vh(r){return 0.5*kH*(r-r0)*(r-r0)-D} // harmonic potential
+function Fh(r){return -kH*(r-r0)} // harmonic force
+
+function draw(){
+  if(pC.width===0){rsz()}
+  const W=pC.width,H=pC.height,p={l:90,r:40,t:40,b:105},pw=W-p.l-p.r,ph=H-p.t-p.b;
+  pX.clearRect(0,0,W,H);pX.fillStyle='#F5F4F0';pX.fillRect(0,0,W,H);
+  const rn=0.5,rx=2.8,vn=-1.1,vx=1.0;
+  const tX=r=>p.l+(r-rn)/(rx-rn)*pw,tY=v=>p.t+(1-(v-vn)/(vx-vn))*ph;
+  pX.strokeStyle='#CCC';pX.lineWidth=1.5;pX.beginPath();pX.moveTo(p.l,p.t);pX.lineTo(p.l,H-p.b);pX.lineTo(W-p.r,H-p.b);pX.stroke();
+  pX.fillStyle='#888';pX.font='500 18px "Noto Sans KR"';pX.textAlign='center';pX.fillText('r',W/2,H-p.b+36);
+  pX.save();pX.translate(28,H/2);pX.rotate(-Math.PI/2);pX.fillText('V(r)',0,0);pX.restore();
+  pX.strokeStyle='#DDD';pX.lineWidth=1;pX.setLineDash([5,4]);pX.beginPath();pX.moveTo(p.l,tY(0));pX.lineTo(W-p.r,tY(0));pX.stroke();pX.setLineDash([]);
+  pX.strokeStyle='#D94F30';pX.lineWidth=3;pX.beginPath();let st=false;
+  for(let i=0;i<=pw;i++){const r=rn+i/pw*(rx-rn),v=V(r);if(v>vx+.3)continue;if(!st){pX.moveTo(p.l+i,tY(v));st=true}else pX.lineTo(p.l+i,tY(v))}pX.stroke();
+  const ef=sl.value/100,eL=-D+ef*D*.88;
+  let rL=r0,rR=r0;for(let r=.5;r<r0;r+=.001)if(V(r)<=eL){rL=r;break};for(let r=2.8;r>r0;r-=.001)if(V(r)<=eL){rR=r;break}
+  if(ef>.02){
+    pX.strokeStyle='#2E6B9E';pX.lineWidth=2;pX.setLineDash([8,5]);pX.beginPath();pX.moveTo(tX(rL),tY(eL));pX.lineTo(tX(rR),tY(eL));pX.stroke();pX.setLineDash([]);
+    pX.fillStyle='#2E6B9E';[rL,rR].forEach(r=>{pX.beginPath();pX.arc(tX(r),tY(eL),5,0,Math.PI*2);pX.fill()});
+    const rA=(rL+rR)/2;
+    pX.strokeStyle='#BBB';pX.lineWidth=1;pX.setLineDash([3,3]);pX.beginPath();pX.moveTo(tX(r0),tY(eL)-10);pX.lineTo(tX(r0),H-p.b+6);pX.stroke();pX.setLineDash([]);
+    pX.strokeStyle='#E8732C';pX.lineWidth=2;pX.setLineDash([5,3]);pX.beginPath();pX.moveTo(tX(rA),tY(eL)-10);pX.lineTo(tX(rA),H-p.b+6);pX.stroke();pX.setLineDash([]);
+    if(rA>r0+.008){const ay=H-p.b+22;pX.strokeStyle='#E8732C';pX.fillStyle='#E8732C';pX.lineWidth=2;pX.setLineDash([]);pX.beginPath();pX.moveTo(tX(r0),ay);pX.lineTo(tX(rA),ay);pX.stroke();pX.beginPath();pX.moveTo(tX(rA),ay);pX.lineTo(tX(rA)-9,ay-4);pX.lineTo(tX(rA)-9,ay+4);pX.fill();pX.font='500 16px "Noto Sans KR"';pX.textAlign='center';pX.fillText('열팽창',(tX(r0)+tX(rA))/2,ay-10)}
+    pX.font='500 18px "Noto Sans KR"';pX.textAlign='center';pX.fillStyle='#888';pX.fillText('r₀',tX(r0),H-p.b+48);pX.fillStyle='#E8732C';pX.fillText('r̄',tX(rA),H-p.b+48);
+  }
+  dp.textContent=ef<.33?'낮음':ef<.66?'보통':'높음';dp.style.color=ef<.33?'var(--bl)':ef<.66?'var(--wm)':'var(--ac)';
+
+  // FIX #3: Force graph — shift y-range up to show repulsive peak
+  const W2=fC.width,H2=fC.height,q={l:90,r:40,t:40,b:105},qw=W2-q.l-q.r,qh=H2-q.t-q.b;
+  fX.clearRect(0,0,W2,H2);fX.fillStyle='#F5F4F0';fX.fillRect(0,0,W2,H2);
+  // FIX: y-range emphasizes positive (repulsive) side more, but still shows negative
+  const frn=0.55,frx=2.5,ffn=-3.0,ffx=3.0;
+  const fTX=r=>q.l+(r-frn)/(frx-frn)*qw,fTY=f=>q.t+(1-(f-ffn)/(ffx-ffn))*qh;
+  fX.strokeStyle='#CCC';fX.lineWidth=1.5;fX.beginPath();fX.moveTo(q.l,q.t);fX.lineTo(q.l,H2-q.b);fX.lineTo(W2-q.r,H2-q.b);fX.stroke();
+  fX.fillStyle='#888';fX.font='500 18px "Noto Sans KR"';fX.textAlign='center';fX.fillText('r',W2/2,H2-q.b+36);
+  fX.save();fX.translate(28,H2/2);fX.rotate(-Math.PI/2);fX.fillText('F(r)',0,0);fX.restore();
+  fX.strokeStyle='#DDD';fX.lineWidth=1;fX.setLineDash([5,4]);fX.beginPath();fX.moveTo(q.l,fTY(0));fX.lineTo(W2-q.r,fTY(0));fX.stroke();fX.setLineDash([]);
+  fX.strokeStyle='#BBB';fX.lineWidth=1;fX.setLineDash([3,3]);fX.beginPath();fX.moveTo(fTX(r0),q.t);fX.lineTo(fTX(r0),H2-q.b);fX.stroke();fX.setLineDash([]);
+  fX.fillStyle='#888';fX.font='500 16px "Noto Sans KR"';fX.textAlign='center';fX.fillText('r₀',fTX(r0),H2-q.b+48);
+  // Colored regions
+  fX.fillStyle='rgba(217,79,48,.06)';fX.fillRect(q.l,q.t,fTX(r0)-q.l,qh);
+  fX.fillStyle='rgba(46,107,158,.06)';fX.fillRect(fTX(r0),q.t,W2-q.r-fTX(r0),qh);
+  // Force curve
+  fX.strokeStyle='#2E6B9E';fX.lineWidth=3;fX.beginPath();st=false;
+  for(let i=0;i<=qw;i++){const r=frn+i/qw*(frx-frn),f=F(r);if(f>ffx+1||f<ffn-1)continue;const x=q.l+i,y=fTY(f);if(!st){fX.moveTo(x,y);st=true}else fX.lineTo(x,y)}fX.stroke();
+  fX.font='600 16px "Noto Sans KR"';
+  fX.fillStyle='rgba(217,79,48,.6)';fX.textAlign='center';fX.fillText('척력 F>0',fTX(.82),fTY(2.0));
+  fX.fillStyle='rgba(46,107,158,.6)';fX.fillText('인력 F<0',fTX(1.8),fTY(-1.5));
+  if(ef>.02&&rL>=frn&&rR<=frx){
+    fX.fillStyle='rgba(46,107,158,.1)';fX.fillRect(fTX(rL),q.t,fTX(rR)-fTX(rL),qh);
+    const fL=F(rL),fR=F(rR);
+    fX.fillStyle='#D94F30';fX.beginPath();fX.arc(fTX(rL),fTY(fL),5,0,Math.PI*2);fX.fill();
+    fX.fillStyle='#2E6B9E';fX.beginPath();fX.arc(fTX(rR),fTY(fR),5,0,Math.PI*2);fX.fill();
+  }
+
+  // ===== HARMONIC POTENTIAL GRAPH =====
+  const W3=hpC.width,H3=hpC.height;
+  const p2={l:90,r:40,t:40,b:105},pw2=W3-p2.l-p2.r,ph2_=H3-p2.t-p2.b;
+  hpX.clearRect(0,0,W3,H3);hpX.fillStyle='#F5F4F0';hpX.fillRect(0,0,W3,H3);
+  const tX2=r=>p2.l+(r-rn)/(rx-rn)*pw2,tY2=v=>p2.t+(1-(v-vn)/(vx-vn))*ph2_;
+  hpX.strokeStyle='#CCC';hpX.lineWidth=1.5;hpX.beginPath();hpX.moveTo(p2.l,p2.t);hpX.lineTo(p2.l,H3-p2.b);hpX.lineTo(W3-p2.r,H3-p2.b);hpX.stroke();
+  hpX.fillStyle='#888';hpX.font='500 18px "Noto Sans KR"';hpX.textAlign='center';hpX.fillText('r',W3/2,H3-p2.b+36);
+  hpX.save();hpX.translate(28,H3/2);hpX.rotate(-Math.PI/2);hpX.fillText('V(r)',0,0);hpX.restore();
+  hpX.strokeStyle='#DDD';hpX.lineWidth=1;hpX.setLineDash([5,4]);hpX.beginPath();hpX.moveTo(p2.l,tY2(0));hpX.lineTo(W3-p2.r,tY2(0));hpX.stroke();hpX.setLineDash([]);
+  // Harmonic curve (parabola)
+  hpX.strokeStyle='#2E6B9E';hpX.lineWidth=3;hpX.beginPath();let st2=false;
+  for(let i=0;i<=pw2;i++){const r=rn+i/pw2*(rx-rn),v=Vh(r);if(v>vx+.3)continue;if(!st2){hpX.moveTo(p2.l+i,tY2(v));st2=true}else hpX.lineTo(p2.l+i,tY2(v))}hpX.stroke();
+  // Energy level
+  if(ef>.02){
+    let hL2=r0,hR2=r0;
+    for(let r=.3;r<r0;r+=.001)if(Vh(r)<=eL){hL2=r;break}
+    for(let r=3;r>r0;r-=.001)if(Vh(r)<=eL){hR2=r;break}
+    hpX.strokeStyle='#2E6B9E';hpX.lineWidth=2;hpX.setLineDash([8,5]);hpX.beginPath();hpX.moveTo(tX2(hL2),tY2(eL));hpX.lineTo(tX2(hR2),tY2(eL));hpX.stroke();hpX.setLineDash([]);
+    hpX.fillStyle='#2E6B9E';[hL2,hR2].forEach(r=>{hpX.beginPath();hpX.arc(tX2(r),tY2(eL),5,0,Math.PI*2);hpX.fill()});
+    const hAvg=(hL2+hR2)/2;
+    hpX.strokeStyle='#BBB';hpX.lineWidth=1;hpX.setLineDash([3,3]);hpX.beginPath();hpX.moveTo(tX2(r0),tY2(eL)-10);hpX.lineTo(tX2(r0),H3-p2.b+6);hpX.stroke();hpX.setLineDash([]);
+    hpX.strokeStyle='#2E6B9E';hpX.lineWidth=2;hpX.setLineDash([5,3]);hpX.beginPath();hpX.moveTo(tX2(hAvg),tY2(eL)-10);hpX.lineTo(tX2(hAvg),H3-p2.b+6);hpX.stroke();hpX.setLineDash([]);
+    hpX.font='500 18px "Noto Sans KR"';hpX.textAlign='center';
+    hpX.fillStyle='#888';hpX.fillText('r₀',tX2(r0),H3-p2.b+48);
+    hpX.fillStyle='#2E6B9E';hpX.fillText('r̄ = r₀',tX2(hAvg),H3-p2.b+70);
+  }
+
+  // ===== HARMONIC FORCE GRAPH =====
+  const W4=hfC.width,H4=hfC.height;
+  const q2={l:90,r:40,t:40,b:105},qw2=W4-q2.l-q2.r,qh2=H4-q2.t-q2.b;
+  hfX.clearRect(0,0,W4,H4);hfX.fillStyle='#F5F4F0';hfX.fillRect(0,0,W4,H4);
+  const fTX2=r=>q2.l+(r-frn)/(frx-frn)*qw2,fTY2=f=>q2.t+(1-(f-ffn)/(ffx-ffn))*qh2;
+  hfX.strokeStyle='#CCC';hfX.lineWidth=1.5;hfX.beginPath();hfX.moveTo(q2.l,q2.t);hfX.lineTo(q2.l,H4-q2.b);hfX.lineTo(W4-q2.r,H4-q2.b);hfX.stroke();
+  hfX.fillStyle='#888';hfX.font='500 18px "Noto Sans KR"';hfX.textAlign='center';hfX.fillText('r',W4/2,H4-q2.b+36);
+  hfX.save();hfX.translate(28,H4/2);hfX.rotate(-Math.PI/2);hfX.fillText('F(r)',0,0);hfX.restore();
+  hfX.strokeStyle='#DDD';hfX.lineWidth=1;hfX.setLineDash([5,4]);hfX.beginPath();hfX.moveTo(q2.l,fTY2(0));hfX.lineTo(W4-q2.r,fTY2(0));hfX.stroke();hfX.setLineDash([]);
+  hfX.strokeStyle='#BBB';hfX.lineWidth=1;hfX.setLineDash([3,3]);hfX.beginPath();hfX.moveTo(fTX2(r0),q2.t);hfX.lineTo(fTX2(r0),H4-q2.b);hfX.stroke();hfX.setLineDash([]);
+  hfX.fillStyle='#888';hfX.font='500 16px "Noto Sans KR"';hfX.textAlign='center';hfX.fillText('r₀',fTX2(r0),H4-q2.b+48);
+  hfX.fillStyle='rgba(217,79,48,.06)';hfX.fillRect(q2.l,q2.t,fTX2(r0)-q2.l,qh2);
+  hfX.fillStyle='rgba(46,107,158,.06)';hfX.fillRect(fTX2(r0),q2.t,W4-q2.r-fTX2(r0),qh2);
+  // Harmonic force (straight line)
+  hfX.strokeStyle='#2E6B9E';hfX.lineWidth=3;hfX.beginPath();let st3=false;
+  for(let i=0;i<=qw2;i++){const r=frn+i/qw2*(frx-frn),f=Fh(r);if(f>ffx+1||f<ffn-1)continue;const x=q2.l+i,y=fTY2(f);if(!st3){hfX.moveTo(x,y);st3=true}else hfX.lineTo(x,y)}hfX.stroke();
+  hfX.font='600 16px "Noto Sans KR"';
+  hfX.fillStyle='rgba(217,79,48,.6)';hfX.textAlign='center';hfX.fillText('척력 F>0',fTX2(.82),fTY2(2.0));
+  hfX.fillStyle='rgba(46,107,158,.6)';hfX.fillText('인력 F<0',fTX2(1.8),fTY2(-1.5));
+  // Interactive: show vibration range on harmonic force graph
+  if(ef>.02){
+    let hfL=r0,hfR=r0;
+    for(let r=.3;r<r0;r+=.001)if(Vh(r)<=eL){hfL=r;break}
+    for(let r=3;r>r0;r-=.001)if(Vh(r)<=eL){hfR=r;break}
+    if(hfL>=frn&&hfR<=frx){
+      hfX.fillStyle='rgba(46,107,158,.1)';hfX.fillRect(fTX2(hfL),q2.t,fTX2(hfR)-fTX2(hfL),qh2);
+      const fhL=Fh(hfL),fhR=Fh(hfR);
+      hfX.fillStyle='#D94F30';hfX.beginPath();hfX.arc(fTX2(hfL),fTY2(fhL),5,0,Math.PI*2);hfX.fill();
+      hfX.fillStyle='#2E6B9E';hfX.beginPath();hfX.arc(fTX2(hfR),fTY2(fhR),5,0,Math.PI*2);hfX.fill();
+      // Show symmetry: |F_left| == |F_right|
+      hfX.fillStyle='#555';hfX.font='500 13px "Noto Sans KR"';hfX.textAlign='center';
+      hfX.fillText('|F₁| = '+Math.abs(fhL).toFixed(2),fTX2(hfL),fTY2(fhL)-12);
+      hfX.fillText('|F₂| = '+Math.abs(fhR).toFixed(2),fTX2(hfR),fTY2(fhR)+18);
+    }
+  }
+  hfX.fillStyle='#2E6B9E';hfX.font='bold 14px "Noto Sans KR"';hfX.textAlign='center';hfX.fillText('← 완벽한 대칭 (직선) →',fTX2(1.5),fTY2(2.5));
+}
+sl.addEventListener('input',draw);
+requestAnimationFrame(draw); // ensure canvases are sized before first draw
+})();
+
+// ===== TWO-ATOM (Morse + Harmonic side by side) =====
+;(function(){
+const mCv=document.getElementById('diatomMorseCanvas'),mCx=mCv.getContext('2d');
+const hCv=document.getElementById('diatomHarmCanvas'),hCx=hCv.getContext('2d');
+const sl=document.getElementById('diatomTempSlider'),td=document.getElementById('diatomTempDisplay');
+const mSd=document.getElementById('diatomMorseStretch'),hSd=document.getElementById('diatomHarmStretch');
+function rsz(){[mCv,hCv].forEach(c=>{const r=c.parentElement.getBoundingClientRect();c.width=r.width*2;c.height=r.height*2})}
+rsz();window.addEventListener('resize',rsz);
+let t=0;
+
+function drawPair(ctx,W,H,dT,hasExpansion,color){
+  const f=dT/100,mx=W/2,my=H/2;
+  const ex=hasExpansion?f*W*.12:0; // Morse expands, Harmonic doesn't
+  const vA=f*W*.04;
+  t+=.025;
+  const vb=Math.sin(t*4)*vA;
+  const bH=W*.14,hD=bH+ex/2;
+  const ax=mx-hD+vb*.7,bx=mx+hD-vb*.7;
+  const aR=Math.min(W,H)*.1;
+
+  ctx.clearRect(0,0,W,H);ctx.fillStyle='#F5F4F0';ctx.fillRect(0,0,W,H);
+
+  // r0 reference (gray dashed)
+  ctx.strokeStyle='#BBB';ctx.lineWidth=2;ctx.setLineDash([8,6]);
+  ctx.beginPath();ctx.moveTo(mx-bH,my-aR*1.5);ctx.lineTo(mx-bH,my+aR*1.5);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(mx+bH,my-aR*1.5);ctx.lineTo(mx+bH,my+aR*1.5);ctx.stroke();
+  ctx.setLineDash([]);
+
+  // r0 brace
+  const by=my+aR*2.2;
+  ctx.strokeStyle='#BBB';ctx.lineWidth=2;
+  ctx.beginPath();ctx.moveTo(mx-bH,by);ctx.lineTo(mx+bH,by);ctx.stroke();
+  ctx.fillStyle='#999';ctx.font=`500 ${Math.round(H*.1)}px "Noto Sans KR"`;ctx.textAlign='center';
+  ctx.fillText('r₀',mx,by+H*.12);
+
+  // r-bar reference (if expanded)
+  if(ex>2){
+    const a1=mx-hD,a2=mx+hD;
+    ctx.strokeStyle=color;ctx.lineWidth=2;ctx.setLineDash([5,3]);
+    ctx.beginPath();ctx.moveTo(a1,my-aR*1.5);ctx.lineTo(a1,my+aR*1.5);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(a2,my-aR*1.5);ctx.lineTo(a2,my+aR*1.5);ctx.stroke();
+    ctx.setLineDash([]);
+    const by2=my-aR*2;
+    ctx.strokeStyle=color;ctx.lineWidth=2;
+    ctx.beginPath();ctx.moveTo(a1,by2);ctx.lineTo(a2,by2);ctx.stroke();
+    ctx.fillStyle=color;ctx.fillText('r̄',mx,by2-H*.05);
+  }
+
+  // Spring
+  const s1=ax+aR*.9,s2=bx-aR*.9,sL=s2-s1,nZ=14,zH=H*.07;
+  ctx.strokeStyle=f<.01?'#AAA':color;ctx.globalAlpha=f<.01?1:.5;ctx.lineWidth=3;
+  ctx.beginPath();ctx.moveTo(s1,my);
+  for(let i=0;i<=nZ;i++)ctx.lineTo(s1+i/nZ*sL,my+(i%2===0?1:-1)*zH*(i>0&&i<nZ?1:0));
+  ctx.stroke();ctx.globalAlpha=1;
+
+  // Atoms
+  const col=tempColor(f);
+  [ax,bx].forEach(x=>{
+    if(f>.1){const g=ctx.createRadialGradient(x,my,aR*.5,x,my,aR*2);g.addColorStop(0,`rgba(230,100,40,${.2*f})`);g.addColorStop(1,'transparent');ctx.fillStyle=g;ctx.beginPath();ctx.arc(x,my,aR*2,0,Math.PI*2);ctx.fill()}
+    ctx.fillStyle=col;ctx.beginPath();ctx.arc(x,my,aR,0,Math.PI*2);ctx.fill();
+  });
+
+  return (ex/(bH*2)*100).toFixed(2);
+}
+
+function an(){
+  const dT=+sl.value;
+  td.textContent=dT+' K';
+  const mPct=drawPair(mCx,mCv.width,mCv.height,dT,true,'#E8732C');
+  const hPct=drawPair(hCx,hCv.width,hCv.height,dT,false,'#2E6B9E');
+  mSd.textContent='Δr / r₀ = '+mPct+' %';
+  hSd.textContent='Δr / r₀ = '+hPct+' %';
+  requestAnimationFrame(an);
+}
+an();
+})();
+
+// ===== LATTICE =====
+;(function(){
+const cv=document.getElementById('latticeCanvas'),cx=cv.getContext('2d');const tS=document.getElementById('tempSlider'),aS=document.getElementById('alphaSlider'),tD=document.getElementById('tempDisplay'),aD=document.getElementById('alphaDisplay');let bc='free',vis={vibration:true,bonds:true},tm=0;const C=8,R=6,EM=200000,VA=300;let at=[];
+function rsz(){const r=cv.parentElement.getBoundingClientRect();cv.width=r.width*2;cv.height=r.height*2}rsz();window.addEventListener('resize',rsz);
+function init(){at=[];for(let j=0;j<R;j++)for(let i=0;i<C;i++)at.push({c:i,r:j,bx:0,by:0,x:0,y:0,p:Math.random()*6.28,q:Math.random()*6.28,f:.8+Math.random()*.4})}init();
+document.querySelectorAll('[data-bc]').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('[data-bc]').forEach(x=>x.classList.remove('active'));b.classList.add('active');bc=b.dataset.bc}));
+document.querySelectorAll('[data-vis]').forEach(b=>b.addEventListener('click',()=>{b.classList.toggle('active');vis[b.dataset.vis]=b.classList.contains('active')}));
+tS.addEventListener('input',()=>tD.textContent=tS.value+' K');
+aS.addEventListener('input',()=>aD.textContent=aS.value);
+function an(){const W=cv.width,H=cv.height,dT=+tS.value,al=+aS.value*1e-6,th=al*dT,vs=th*VA,bs=Math.min(W/(C+2.5),H/(R+2.5));let sx=0,sy=0;if(bc==='free'){sx=vs;sy=vs}else if(bc==='uniaxial')sy=vs;const spx=bs*(1+sx),spy=bs*(1+sy),mx=(W-spx*(C-1))/2,my=(H-spy*(R-1))/2,va=vis.vibration?(dT/100)*bs*.06:0;tm+=.04;at.forEach(a=>{a.bx=mx+a.c*spx;a.by=my+a.r*spy;a.x=a.bx+Math.sin(tm*a.f*3+a.p)*va;a.y=a.by+Math.cos(tm*a.f*3+a.q)*va});cx.clearRect(0,0,W,H);if(bc==='fixed'){cx.fillStyle='rgba(217,79,48,.04)';cx.fillRect(0,0,W,H);ht(cx,W,H,'all')}else if(bc==='uniaxial'){cx.fillStyle='rgba(217,79,48,.03)';cx.fillRect(0,0,W,H);ht(cx,W,H,'x')}if((bc==='free'||bc==='uniaxial')&&dT>3){const rx=(W-bs*(C-1))/2,ry=(H-bs*(R-1))/2;cx.strokeStyle='rgba(0,0,0,.07)';cx.lineWidth=1;cx.setLineDash([3,5]);for(let j=0;j<R;j++)for(let i=0;i<C;i++){const x=rx+i*bs,y=ry+j*bs;if(i<C-1){cx.beginPath();cx.moveTo(x,y);cx.lineTo(rx+(i+1)*bs,y);cx.stroke()}if(j<R-1){cx.beginPath();cx.moveTo(x,y);cx.lineTo(x,ry+(j+1)*bs);cx.stroke()}}cx.setLineDash([])}if(vis.bonds)at.forEach(a=>{if(a.c<C-1){const n=at[a.r*C+a.c+1];bd(a,n,bs)}if(a.r<R-1){const n=at[(a.r+1)*C+a.c];bd(a,n,bs)}});const tf=dT/100,ar=bs*.15;at.forEach(a=>{const cl=tempColor(tf);if(tf>.1){const g=cx.createRadialGradient(a.x,a.y,ar*.5,a.x,a.y,ar*2.5);g.addColorStop(0,cl.replace('rgb','rgba').replace(')',`,${.2*tf})`));g.addColorStop(1,'transparent');cx.fillStyle=g;cx.beginPath();cx.arc(a.x,a.y,ar*2.5,0,Math.PI*2);cx.fill()}cx.fillStyle=cl;cx.beginPath();cx.arc(a.x,a.y,ar,0,Math.PI*2);cx.fill()});let ds,ss,ed;if(bc==='free'){ds=th;ss=0;ed=0}else if(bc==='fixed'){ds=0;ss=-EM*th;ed=-th}else{ds=th;ss=-EM*th;ed=-th}document.getElementById('strainVal').textContent=(ds*100).toFixed(3)+' %';document.getElementById('thermalStrainVal').textContent=(th*100).toFixed(3)+' %';document.getElementById('elasticStrainVal').textContent=(ed*100).toFixed(3)+' %';document.getElementById('stressVal').textContent=ss.toFixed(1)+' MPa';requestAnimationFrame(an)}
+function bd(a,b,bs){const dx=b.x-a.x,dy=b.y-a.y,d=Math.sqrt(dx*dx+dy*dy),s=(d-bs)/bs;let c;if(Math.abs(s)<.002)c='#AAA';else if(s>0)c=`rgba(46,107,158,${Math.min(1,s*5+.3)})`;else c=`rgba(217,79,48,${Math.min(1,-s*5+.3)})`;cx.strokeStyle=c;cx.lineWidth=Math.max(1.5,4-Math.abs(s)*12);cx.beginPath();cx.moveTo(a.x,a.y);cx.lineTo(b.x,b.y);cx.stroke()}
+function ht(c,W,H,t){c.strokeStyle='rgba(217,79,48,.12)';c.lineWidth=1.5;const g=18;if(t==='all'||t==='x'){for(let y=0;y<H;y+=g){c.beginPath();c.moveTo(0,y);c.lineTo(16,y+10);c.stroke();c.beginPath();c.moveTo(W,y);c.lineTo(W-16,y+10);c.stroke()}}if(t==='all'){for(let x=0;x<W;x+=g){c.beginPath();c.moveTo(x,0);c.lineTo(x+10,16);c.stroke();c.beginPath();c.moveTo(x,H);c.lineTo(x+10,H-16);c.stroke()}}}an()})();
+
+// ===== MOLECULAR DYNAMICS — SPRING LATTICE MODEL =====
+// Unit cell: 4 atoms (2x2), 6 springs per cell (4 edges + 2 diagonals)
+// Asymmetric: Morse force F = -2*De*a*exp(-a(r-r0))*(1-exp(-a(r-r0)))
+// Symmetric:  Harmonic F = -k*(r-r0) with k = 2*De*a^2 (same curvature at r0)
+;(function(){
+'use strict';
+const NX=4,NY=4,aR=NX+1,aC=NY+1,N=aR*aC; // 5x5=25 atoms
+const r0_edge=1.0, r0_diag=r0_edge*Math.SQRT2;
+const De=1.0, aM=1.5;
+const kH=2*De*aM*aM; // harmonic k matched to Morse curvature at r0
+const r0=r0_edge; // alias for display/measurement
+const mass=1.0, dt=0.0005, SPF=40;
+const iBL=0, iBR=NX, iTL=NY*aR;
+let running=false,showTrails=false;
+document.getElementById('mdRunBtn').addEventListener('click',function(){running=!running;this.textContent=running?'⏸ 일시정지':'▶ 시작';this.classList.toggle('active',running)});
+document.getElementById('mdResetBtn').addEventListener('click',doReset);
+document.getElementById('mdTrailBtn').addEventListener('click',function(){showTrails=!showTrails;this.classList.toggle('active',showTrails)});
+
+function buildSprings(){
+  const sp=[],idx=(x,y)=>y*aR+x;
+  for(let cy=0;cy<NY;cy++)for(let cx=0;cx<NX;cx++){
+    const bl=idx(cx,cy),br=idx(cx+1,cy),tl=idx(cx,cy+1),tr=idx(cx+1,cy+1);
+    sp.push([bl,br,r0_edge],[tl,tr,r0_edge],[bl,tl,r0_edge],[br,tr,r0_edge],[bl,tr,r0_diag],[br,tl,r0_diag]);
+  }
+  const seen=new Set,u=[];
+  for(const s of sp){const k2=Math.min(s[0],s[1])*10000+Math.max(s[0],s[1]);if(!seen.has(k2)){seen.add(k2);u.push(s)}}return u;
+}
+const springs=buildSprings();
+
+function makeState(){
+  const x=new Float64Array(N),y=new Float64Array(N),vx=new Float64Array(N),vy=new Float64Array(N),fx=new Float64Array(N),fy=new Float64Array(N);
+  for(let iy=0;iy<aC;iy++)for(let ix=0;ix<aR;ix++){x[iy*aR+ix]=ix*r0_edge;y[iy*aR+ix]=iy*r0_edge}
+  return{x,y,vx,vy,fx,fy,PE:0,KE:0,trails:[]};
+}
+
+function forces(s,isAsym){
+  const{x,y,fx,fy}=s;fx.fill(0);fy.fill(0);let PE=0;
+  for(const sp of springs){
+    const[i,j,L0]=sp;const dx=x[j]-x[i],dy=y[j]-y[i],L=Math.sqrt(dx*dx+dy*dy);
+    if(L<.01)continue;
+    let Fscalar; // F>0 pulls together (tension), F<0 pushes apart (compression)
+    if(isAsym){
+      // Morse: V = De*(1-exp(-a*(r-r0)))^2 - De
+      // F = -dV/dr = -2*De*a*exp(-a*(r-r0))*(1-exp(-a*(r-r0)))
+      // Convention: F<0 when r<r0 (repulsion), F>0 ... wait, let me be careful.
+      // At r<r0: exp term >1, (1-exp)<0, so F = -2*De*a*(positive)*(negative) = positive
+      // Positive F = repulsion = push apart. But our convention is F>0 = pull together.
+      // So we NEGATE: Fscalar = 2*De*a*exp(-a*(L-L0))*(1-exp(-a*(L-L0)))
+      // This gives: L<L0 → negative (push apart ✓), L>L0 → positive (pull together ✓)
+      const ex=Math.exp(-aM*(L-L0));
+      Fscalar=2*De*aM*ex*(1-ex);
+      PE+=De*(1-ex)*(1-ex)-De;
+    }else{
+      // Harmonic: F = -k*(r-r0), with our convention: Fscalar = k*(L0-L)... no
+      // k*(L-L0) > 0 when stretched → pull together ✓
+      // k*(L-L0) < 0 when compressed → push apart ✓
+      const dl=L-L0;
+      Fscalar=kH*dl;
+      PE+=.5*kH*dl*dl;
+    }
+    // Fscalar>0: pull i toward j. dx points from i to j.
+    const fxi=Fscalar*dx/L,fyi=Fscalar*dy/L;
+    fx[i]+=fxi;fy[i]+=fyi;fx[j]-=fxi;fy[j]-=fyi;
+  }
+  s.PE=PE;
+}
+
+function applyBC(s){
+  // Bottom-left: pin ux and uy
+  s.x[iBL]=0;s.y[iBL]=0;s.vx[iBL]=0;s.vy[iBL]=0;
+  // Bottom-right: pin uy only (free in x)
+  s.y[iBR]=0;s.vy[iBR]=0;
+  // Top-left: pin ux only (free in y)
+  s.x[iTL]=0;s.vx[iTL]=0;
+}
+
+function vv(s,isA){
+  const{x,y,vx,vy,fx,fy}=s;const hd=.5*dt/mass;
+  for(let i=0;i<N;i++){vx[i]+=hd*fx[i];vy[i]+=hd*fy[i];x[i]+=dt*vx[i];y[i]+=dt*vy[i]}
+  applyBC(s);
+  forces(s,isA);let KE=0;
+  for(let i=0;i<N;i++){vx[i]+=hd*fx[i];vy[i]+=hd*fy[i];KE+=.5*mass*(vx[i]*vx[i]+vy[i]*vy[i])}
+  s.KE=KE;
+  applyBC(s);
+  for(let i=0;i<N;i++){const sp=Math.sqrt(vx[i]*vx[i]+vy[i]*vy[i]);if(sp>8){vx[i]*=8/sp;vy[i]*=8/sp}}
+}
+
+function therm(s,tgt){
+  if(tgt<1e-8){for(let i=0;i<N;i++){s.vx[i]*=.99;s.vy[i]*=.99}return}
+  const cur=s.KE/N;
+  if(cur<1e-12){const v0=Math.sqrt(tgt/mass);let sx=0,sy=0;for(let i=0;i<N;i++){s.vx[i]=(Math.random()-.5)*2*v0;s.vy[i]=(Math.random()-.5)*2*v0;sx+=s.vx[i];sy+=s.vy[i]}sx/=N;sy/=N;for(let i=0;i<N;i++){s.vx[i]-=sx;s.vy[i]-=sy}applyBC(s);return}
+  const lam=Math.sqrt(1+(dt/.3)*(tgt/cur-1)),cl=Math.max(.97,Math.min(1.03,lam));
+  for(let i=0;i<N;i++){s.vx[i]*=cl;s.vy[i]*=cl}
+}
+
+function meas(s){let tot=0,cnt=0;for(const sp of springs){if(Math.abs(sp[2]-r0_edge)<.01){const dx=s.x[sp[1]]-s.x[sp[0]],dy=s.y[sp[1]]-s.y[sp[0]];tot+=Math.sqrt(dx*dx+dy*dy);cnt++}}return cnt>0?tot/cnt:r0_edge}
+
+function drawMD(ctx,s,W,H,color){
+  const{x,y}=s;let xn=1e9,xx=-1e9,yn=1e9,yx=-1e9;
+  for(let i=0;i<N;i++){xn=Math.min(xn,x[i]);xx=Math.max(xx,x[i]);yn=Math.min(yn,y[i]);yx=Math.max(yx,y[i])}
+  const pd=r0*.8;xn-=pd;xx+=pd;yn-=pd;yx+=pd;
+  const rX=xx-xn,rY=yx-yn,sc=Math.min(W/rX,H/rY)*.9;
+  const ox=(W-rX*sc)/2-xn*sc,oy=(H-rY*sc)/2-yn*sc;
+  const tX=v=>ox+v*sc,tY=v=>H-(oy+v*sc);
+  ctx.clearRect(0,0,W,H);ctx.fillStyle='#F5F4F0';ctx.fillRect(0,0,W,H);
+  // Ref grid
+  ctx.strokeStyle='rgba(0,0,0,.06)';ctx.lineWidth=1;ctx.setLineDash([3,4]);
+  for(let iy=0;iy<aC;iy++)for(let ix=0;ix<aR;ix++){const rx=ix*r0,ry=iy*r0;if(ix<aR-1){ctx.beginPath();ctx.moveTo(tX(rx),tY(ry));ctx.lineTo(tX((ix+1)*r0),tY(ry));ctx.stroke()}if(iy<aC-1){ctx.beginPath();ctx.moveTo(tX(rx),tY(ry));ctx.lineTo(tX(rx),tY((iy+1)*r0));ctx.stroke()}}ctx.setLineDash([]);
+  // Trails
+  if(showTrails&&s.trails.length>1){ctx.globalAlpha=.1;for(let i=0;i<N;i++){ctx.strokeStyle=color;ctx.lineWidth=1;ctx.beginPath();let f=true;for(const fr of s.trails){if(f){ctx.moveTo(tX(fr[i*2]),tY(fr[i*2+1]));f=false}else ctx.lineTo(tX(fr[i*2]),tY(fr[i*2+1]))}ctx.stroke()}ctx.globalAlpha=1}
+  // Springs
+  for(const sp of springs){const[i,j,L0]=sp;const isDiag=Math.abs(L0-r0_diag)<.01;ctx.strokeStyle=color==='#D94F30'?(isDiag?'rgba(217,79,48,.12)':'rgba(217,79,48,.25)'):(isDiag?'rgba(46,107,158,.12)':'rgba(46,107,158,.25)');ctx.lineWidth=isDiag?1:1.5;ctx.beginPath();ctx.moveTo(tX(x[i]),tY(y[i]));ctx.lineTo(tX(x[j]),tY(y[j]));ctx.stroke()}
+  // Atoms
+  const ar2=Math.max(3,r0*sc*.12);for(let i=0;i<N;i++){ctx.fillStyle=color;ctx.beginPath();ctx.arc(tX(x[i]),tY(y[i]),ar2,0,Math.PI*2);ctx.fill()}
+  // Pin markers on constrained corners
+  const pinR=ar2*1.8;ctx.strokeStyle='#333';ctx.lineWidth=2;
+  // BL: ux,uy pinned (full pin — triangle)
+  ctx.beginPath();ctx.moveTo(tX(x[iBL])-pinR,tY(y[iBL])+pinR);ctx.lineTo(tX(x[iBL])+pinR,tY(y[iBL])+pinR);ctx.lineTo(tX(x[iBL]),tY(y[iBL]));ctx.closePath();ctx.stroke();
+  // BR: uy pinned (roller — triangle + line)
+  ctx.beginPath();ctx.moveTo(tX(x[iBR])-pinR,tY(y[iBR])+pinR);ctx.lineTo(tX(x[iBR])+pinR,tY(y[iBR])+pinR);ctx.lineTo(tX(x[iBR]),tY(y[iBR]));ctx.closePath();ctx.stroke();
+  ctx.beginPath();ctx.moveTo(tX(x[iBR])-pinR,tY(y[iBR])+pinR+4);ctx.lineTo(tX(x[iBR])+pinR,tY(y[iBR])+pinR+4);ctx.stroke();
+  // TL: ux pinned (roller rotated)
+  ctx.beginPath();ctx.moveTo(tX(x[iTL])-pinR,tY(y[iTL])-pinR);ctx.lineTo(tX(x[iTL])-pinR,tY(y[iTL])+pinR);ctx.lineTo(tX(x[iTL]),tY(y[iTL]));ctx.closePath();ctx.stroke();
+  ctx.beginPath();ctx.moveTo(tX(x[iTL])-pinR-4,tY(y[iTL])-pinR);ctx.lineTo(tX(x[iTL])-pinR-4,tY(y[iTL])+pinR);ctx.stroke();
+}
+
+function drawChart(ctx,W,H,hist,color,lbl){
+  ctx.clearRect(0,0,W,H);ctx.fillStyle='#F5F4F0';ctx.fillRect(0,0,W,H);if(hist.length<2)return;
+  const p={l:50,r:12,t:18,b:22},pw=W-p.l-p.r,ph=H-p.t-p.b;
+  let mn=1e9,mx=-1e9;for(const v of hist){mn=Math.min(mn,v);mx=Math.max(mx,v)}const rng=Math.max(mx-mn,.003);mn-=rng*.15;mx+=rng*.15;
+  ctx.strokeStyle='#CCC';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(p.l,p.t);ctx.lineTo(p.l,H-p.b);ctx.lineTo(W-p.r,H-p.b);ctx.stroke();
+  if(r0>=mn&&r0<=mx){const yr=p.t+(1-(r0-mn)/(mx-mn))*ph;ctx.strokeStyle='#BBB';ctx.lineWidth=1;ctx.setLineDash([3,3]);ctx.beginPath();ctx.moveTo(p.l,yr);ctx.lineTo(W-p.r,yr);ctx.stroke();ctx.setLineDash([]);ctx.fillStyle='#999';ctx.font='10px sans-serif';ctx.textAlign='right';ctx.fillText('r₀',p.l-4,yr+3)}
+  ctx.strokeStyle=color;ctx.lineWidth=2;ctx.beginPath();const mP=Math.min(hist.length,400),sI=hist.length-mP;
+  for(let i=0;i<mP;i++){const px=p.l+i/(mP-1)*pw,py=p.t+(1-(hist[sI+i]-mn)/(mx-mn))*ph;if(i===0)ctx.moveTo(px,py);else ctx.lineTo(px,py)}ctx.stroke();
+  ctx.fillStyle=color;ctx.font='bold 11px sans-serif';ctx.textAlign='left';ctx.fillText(lbl+': '+hist[hist.length-1].toFixed(4),p.l+5,p.t+12);
+}
+
+const mCv=document.getElementById('mdMorseCanvas'),mCx=mCv.getContext('2d');
+const hCv=document.getElementById('mdHarmonicCanvas'),hCx=hCv.getContext('2d');
+const mcCv=document.getElementById('mdMorseChart'),mcCx=mcCv.getContext('2d');
+const hcCv=document.getElementById('mdHarmonicChart'),hcCx=hcCv.getContext('2d');
+function resAll(){[mCv,hCv].forEach(c=>{const r=c.parentElement.getBoundingClientRect();c.width=r.width*2;c.height=r.height*2});[mcCv,hcCv].forEach(c=>{const r=c.parentElement.getBoundingClientRect();c.width=r.width*2;c.height=r.height*2})}
+resAll();window.addEventListener('resize',resAll);
+let mS,hS,mH=[],hH=[],fN=0;
+function doReset(){mS=makeState();hS=makeState();applyBC(mS);applyBC(hS);forces(mS,true);forces(hS,false);mH.length=0;hH.length=0;fN=0}doReset();
+const mdSl=document.getElementById('mdTempSlider'),mdTD=document.getElementById('mdTempDisplay');
+function loop(){
+  const tgt=(mdSl.value/100)*.1;mdTD.textContent=tgt.toFixed(3);
+  if(running){for(let s=0;s<SPF;s++){therm(mS,tgt);therm(hS,tgt);vv(mS,true);vv(hS,false)}fN++;
+    if(showTrails){const mf=new Float64Array(N*2),hf=new Float64Array(N*2);for(let i=0;i<N;i++){mf[i*2]=mS.x[i];mf[i*2+1]=mS.y[i];hf[i*2]=hS.x[i];hf[i*2+1]=hS.y[i]}mS.trails.push(mf);hS.trails.push(hf);if(mS.trails.length>50)mS.trails.shift();if(hS.trails.length>50)hS.trails.shift()}else{mS.trails.length=0;hS.trails.length=0}
+    if(fN%4===0){mH.push(meas(mS));hH.push(meas(hS));if(mH.length>400)mH.shift();if(hH.length>400)hH.shift()}}
+  drawMD(mCx,mS,mCv.width,mCv.height,'#D94F30');drawMD(hCx,hS,hCv.width,hCv.height,'#2E6B9E');
+  drawChart(mcCx,mcCv.width,mcCv.height,mH,'#D94F30','⟨a⟩ Morse');drawChart(hcCx,hcCv.width,hcCv.height,hH,'#2E6B9E','⟨a⟩ Harmonic');
+  if(mH.length){const a=mH[mH.length-1];document.getElementById('mdML').textContent=a.toFixed(4);document.getElementById('mdME').textContent=((a/r0-1)*100).toFixed(2)+' %'}
+  if(hH.length){const a=hH[hH.length-1];document.getElementById('mdHL').textContent=a.toFixed(4);document.getElementById('mdHE').textContent=((a/r0-1)*100).toFixed(2)+' %'}
+  document.getElementById('mdMT').textContent=(mS.KE/N).toFixed(4);document.getElementById('mdHT').textContent=(hS.KE/N).toFixed(4);
+  document.getElementById('mdMEn').textContent=((mS.PE+mS.KE)/N).toFixed(3);document.getElementById('mdHEn').textContent=((hS.PE+hS.KE)/N).toFixed(3);
+  requestAnimationFrame(loop);
+}loop();
+})();
+</script>
+</body>
+</html>
